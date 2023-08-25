@@ -26,12 +26,12 @@ function AppWithProviders({
       <link rel="manifest" href="/manifest.json" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
-      <meta name="apple-mobile-web-app-title" content="App Title" />
+      <meta name="apple-mobile-web-app-title" content="Lens PWA" />
 
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" href="/images/icons/icon-512x512.png" />
-      <meta name="theme-color" content="#ffffff" />
+      <meta name="theme-color" content="#000000" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
       <body className={inter.className}>
