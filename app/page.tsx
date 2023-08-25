@@ -67,7 +67,7 @@ export default function Home() {
         </div>
         </a>
         <h1 className="text-5xl font-bold mt-3">
-          Social Explorer
+          Lens PWA 
         </h1>
         <p className="mt-4 max-w-[750px] text-lg text-muted-foreground sm:text-xl">
           An application boilerplate built with a modern stack. Simple to get started building your first social app. Leveraging ShadCN, Lens Protocol, Next.js, and WalletConnect.
