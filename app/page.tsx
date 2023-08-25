@@ -58,12 +58,18 @@ export default function Home() {
     ">
       <div>
         <a target="_blank" rel="no-opener" href="https://lens.xyz">
-        <div className="cursor-pointer flex items-center bg-secondary text-foreground rounded-lg py-1 px-3 mb-2 max-w-[288px]">
-          <p className='mr-2'>📚</p>
-          <p className="text-sm">
-          Learn more about Lens Protocol.
-          </p>
-          <ArrowRight className='ml-2' size={14} />
+        <div className="
+        flex
+        text-foreground mb-2">
+          <div className="
+          cursor-pointer items-center 
+          flex grow-0 bg-secondary py-1 px-3 rounded-lg ">
+            <p className='mr-2'>📚</p>
+            <p className="text-sm">
+            Learn more about Lens Protocol.
+            </p>
+            <ArrowRight className='ml-2' size={14} />
+          </div>
         </div>
         </a>
         <h1 className="text-5xl font-bold mt-3">
