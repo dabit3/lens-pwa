@@ -63,7 +63,7 @@ export default function Provider({
           appearance: {
             theme: 'dark',
             accentColor: '#676FFF',
-            logo: 'https://i.imgur.com/lis215f.png',
+            logo: 'https://i.imgur.com/tzKMWv9.png',
           },
           embeddedWallets: {
             createOnLogin: 'all-users',
