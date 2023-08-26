@@ -9,8 +9,6 @@ import { ChevronRight, Droplets, LogOut } from "lucide-react"
 import LensProvider from './lens-provider'
 import { WalletProvider } from './WalletProvider'
 import { Button } from '@/components/ui/button'
-import { useAccount } from 'wagmi'
-import { disconnect } from '@wagmi/core'
 import { usePathname } from 'next/navigation'
 import { useWalletLogin } from '@lens-protocol/react-web'
 import { usePrivy } from '@privy-io/react-auth'
@@ -52,7 +50,6 @@ export default function RootLayout({ children }) {
 }
 
 function Nav() {
-  const { address } = useAccount()
   const pathname = usePathname()
   const { execute: loginWithLens } = useWalletLogin();
   const { login, logout, user } = usePrivy()
