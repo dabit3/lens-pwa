@@ -4,50 +4,59 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import Link from 'next/link'
-const inter = Inter({ subsets: ['latin'] })
 import { ModeToggle } from '@/components/dropdown'
 import { ChevronRight, Droplets, LogOut } from "lucide-react"
 import LensProvider from './lens-provider'
 import { WalletProvider } from './WalletProvider'
 import { Button } from '@/components/ui/button'
-import { useWeb3Modal } from '@web3modal/react'
 import { useAccount } from 'wagmi'
 import { disconnect } from '@wagmi/core'
 import { usePathname } from 'next/navigation'
+import { useWalletLogin } from '@lens-protocol/react-web'
+import { usePrivy } from '@privy-io/react-auth'
 
-function AppWithProviders({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+const inter = Inter({ subsets: ['latin'] })
+
+export default function RootLayout({ children }) {
+  const handleLogin = (user) => {
+    console.log('user; ', user)
+  }
   return (
     <html lang="en">
-      {/* PWA icons */}
-      <link rel="manifest" href="/manifest.json" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
-      <meta name="apple-mobile-web-app-title" content="Lens PWA" />
+    {/* PWA config */}
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
+    <meta name="apple-mobile-web-app-title" content="Lens PWA" />
 
-      <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" href="/images/icons/icon-512x512.png" />
-      <meta name="theme-color" content="#000000" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/images/icons/icon-512x512.png" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-      <body className={inter.className}>
+    <body className={inter.className}>
+      <LensProvider
+        handleLogin={handleLogin}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Nav />
+          <WalletProvider>
           {children}
+          </WalletProvider>
         </ThemeProvider>
-      </body>
+      </LensProvider>
+    </body>
     </html>
   )
 }
 
 function Nav() {
-  const { open, close, } = useWeb3Modal()
   const { address } = useAccount()
   const pathname = usePathname()
+  const { execute: loginWithLens } = useWalletLogin();
+  const { login, logout, user } = usePrivy()
+  console.log('user: ', user)
 
   return (
     <nav className='
@@ -69,6 +78,13 @@ function Nav() {
         <Link href="/search" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
           <p>Search</p>
         </Link>
+        {
+          user && (
+            <Link href="/profile" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
+              <p>Profile</p>
+            </Link>
+          )
+        }
       </div>
       <div className='
         flex
@@ -76,16 +92,16 @@ function Nav() {
         pl-8 pb-3 sm:p-0
       '>
         {
-          !address && (
-            <Button onClick={open} variant="secondary" className="mr-4">
-          Sign In
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+          !user && (
+            <Button onClick={login} variant="secondary" className="mr-4">
+              Sign In
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           )
         }
         {
-          address && (
-            <Button onClick={disconnect} variant="secondary" className="mr-4">
+          user && (
+            <Button onClick={logout} variant="secondary" className="mr-4">
             Sign out
             <LogOut className="h-4 w-4 ml-3" />
           </Button>
@@ -94,17 +110,5 @@ function Nav() {
         <ModeToggle />
       </div>
     </nav>
-  )
-}
-
-export default function RootLayout({ children, ...props }) {
-  return (
-    <LensProvider>
-        <AppWithProviders {...props}>
-          <WalletProvider>
-          {children}
-          </WalletProvider>
-        </AppWithProviders>
-    </LensProvider>
   )
 }
