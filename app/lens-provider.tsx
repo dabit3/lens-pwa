@@ -63,7 +63,7 @@ export default function Provider({
           appearance: {
             theme: 'dark',
             accentColor: '#676FFF',
-            logo: 'https://arweave.net/WIKx7IJ9AZBclV4UjF5xo3q_MijMy1cel_BfWLe4xHk',
+            logo: 'https://i.imgur.com/lis215f.png',
           },
           embeddedWallets: {
             createOnLogin: 'all-users',
