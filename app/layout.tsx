@@ -73,6 +73,7 @@ function Nav() {
 
     window.addEventListener('beforeinstallprompt', (e) => {
       console.log('beforeinstallprompt: ')
+      setIsInstalled(false)
       e.preventDefault()
       setDeferredPrompt(e)
     });
