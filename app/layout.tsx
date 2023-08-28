@@ -5,13 +5,14 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import Link from 'next/link'
 import { ModeToggle } from '@/components/dropdown'
-import { ChevronRight, Droplets, LogOut } from "lucide-react"
+import { ChevronRight, Droplets, LogOut, ArrowBigDownDash } from "lucide-react"
 import LensProvider from './lens-provider'
 import { WalletProvider } from './WalletProvider'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { useWalletLogin } from '@lens-protocol/react-web'
 import { usePrivy } from '@privy-io/react-auth'
+import { useState, useEffect } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -55,6 +56,42 @@ function Nav() {
   const { login, logout, user } = usePrivy()
   console.log('user: ', user)
 
+  const [isInstalled, setIsInstalled] = useState(true)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>()
+
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    if (document.referrer.includes('Homescreen')) {
+      console.log('app is installed')
+      setIsInstalled(true)
+    } else if (isStandalone) {
+      setIsInstalled(false)
+      console.log('app is not installed')
+    } else {
+      setIsInstalled(true)
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('beforeinstallprompt: ')
+      e.preventDefault()
+      setDeferredPrompt(e)
+    });
+  }, [])
+
+  async function addToHomeScreen() {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt')
+        setIsInstalled(true)
+      } else {
+        console.log('User dismissed the A2HS prompt');
+      }
+      setDeferredPrompt(null);
+    })
+  };
+  
   return (
     <nav className='
     border-b flex
@@ -63,7 +100,9 @@ function Nav() {
     sm:pr-10
     '>
       <div
-        className='py-3 px-8 flex flex-1 items-center p'
+        className='
+        sm:px-8
+        py-3 px-4 flex flex-1 items-center p'
       >
         <Link href="/" className='mr-5 flex items-center'>
           <Droplets className="opacity-85" size={19} />
@@ -86,7 +125,7 @@ function Nav() {
       <div className='
         flex
         sm:items-center
-        pl-8 pb-3 sm:p-0
+        pl-4 pb-3 sm:p-0
       '>
         {
           !user && (
@@ -96,6 +135,12 @@ function Nav() {
             </Button>
           )
         }
+        {isInstalled ? null : (
+          <Button onClick={addToHomeScreen} variant="secondary" className="mr-2">
+            Add to Screen
+            <ArrowBigDownDash className="h-4 w-4" />
+          </Button>
+        )}
         {
           user && (
             <Button onClick={logout} variant="secondary" className="mr-4">
