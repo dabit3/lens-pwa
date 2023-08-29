@@ -13,6 +13,7 @@ import { usePathname } from 'next/navigation'
 import { useWalletLogin } from '@lens-protocol/react-web'
 import { usePrivy } from '@privy-io/react-auth'
 import { useState, useEffect } from 'react'
+import { isSafari } from 'react-device-detect'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -54,32 +55,36 @@ function Nav() {
   const pathname = usePathname()
   const { execute: loginWithLens } = useWalletLogin();
   const { login, logout, user } = usePrivy()
-  console.log('user: ', user)
 
   const [isInstalled, setIsInstalled] = useState(true)
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
 
-  useEffect(() => {
+  useEffect( () => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    if (document.referrer.includes('Homescreen')) {
-      console.log('app is installed')
-      setIsInstalled(true)
-    } else if (isStandalone) {
+    if (isSafari && !isStandalone) {
       setIsInstalled(false)
-      console.log('app is not installed')
-    } else {
-      setIsInstalled(true)
     }
-
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('beforeinstallprompt: ')
       setIsInstalled(false)
       e.preventDefault()
       setDeferredPrompt(e)
-    });
+    })
   }, [])
 
   async function addToHomeScreen() {
+    if (isSafari) {
+      const shareData = {
+        title: 'Save to home screen',
+        text: 'Save Lens PWA to your home screen'
+      }
+
+      try {
+        await navigator.share(shareData)
+        return
+      } catch (err) {
+        console.log('error...', err)
+      }
+    }
     if (!deferredPrompt) return
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
@@ -130,7 +135,7 @@ function Nav() {
       '>
         {
           !user && (
-            <Button onClick={login} variant="secondary" className="mr-4">
+            <Button onClick={login} variant="secondary" className="mr-2">
               Sign In
               <ChevronRight className="h-4 w-4" />
             </Button>
