@@ -60,10 +60,10 @@ function Nav() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
 
   useEffect( () => {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    if (isSafari && !isStandalone) {
-      setIsInstalled(false)
-    }
+    // const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    // if (isSafari && !isStandalone) {
+    //   setIsInstalled(false)
+    // }
     window.addEventListener('beforeinstallprompt', (e) => {
       setIsInstalled(false)
       e.preventDefault()
@@ -72,19 +72,6 @@ function Nav() {
   }, [])
 
   async function addToHomeScreen() {
-    if (isSafari) {
-      const shareData = {
-        title: 'Save to home screen',
-        text: 'Save Lens PWA to your home screen'
-      }
-
-      try {
-        await navigator.share(shareData)
-        return
-      } catch (err) {
-        console.log('error...', err)
-      }
-    }
     if (!deferredPrompt) return
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
