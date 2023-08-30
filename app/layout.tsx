@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { ModeToggle } from '@/components/dropdown'
 import { ChevronRight, Droplets, LogOut, ArrowBigDownDash } from "lucide-react"
 import LensProvider from './lens-provider'
-import { WalletProvider } from './WalletProvider'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { useWalletLogin } from '@lens-protocol/react-web'
@@ -20,6 +19,7 @@ const inter = Inter({ subsets: ['latin'] })
 export default function RootLayout({ children }) {
   const handleLogin = (user) => {
     console.log('user; ', user)
+    window.scrollTo({top: 0, behavior: 'smooth'})
   }
   return (
     <html lang="en">
@@ -41,9 +41,7 @@ export default function RootLayout({ children }) {
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Nav />
-          <WalletProvider>
           {children}
-          </WalletProvider>
         </ThemeProvider>
       </LensProvider>
     </body>
@@ -60,10 +58,6 @@ function Nav() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
 
   useEffect( () => {
-    // const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    // if (isSafari && !isStandalone) {
-    //   setIsInstalled(false)
-    // }
     window.addEventListener('beforeinstallprompt', (e) => {
       setIsInstalled(false)
       e.preventDefault()

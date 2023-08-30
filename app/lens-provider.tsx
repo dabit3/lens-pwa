@@ -1,10 +1,10 @@
-"use client";
-import "./globals.css";
-import { polygonMumbai, polygon } from "wagmi/chains";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { publicProvider } from "wagmi/providers/public";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { LensProvider, production, development } from "@lens-protocol/react-web";
+"use client"
+import "./globals.css"
+import { polygonMumbai, polygon } from "wagmi/chains"
+import { configureChains, createConfig, WagmiConfig } from "wagmi"
+import { publicProvider } from "wagmi/providers/public"
+import { InjectedConnector } from "wagmi/connectors/injected"
+import { LensProvider, production, development } from "@lens-protocol/react-web"
 import { PrivyProvider, ConnectedWallet, useWallets } from '@privy-io/react-auth'
 import { useRef } from 'react'
 
@@ -29,7 +29,7 @@ const config = createConfig({
 export default function Provider({
   children, handleLogin
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
   handleLogin: (user: any) => void;
 }) {
   const { wallets } = useWallets()
@@ -37,18 +37,18 @@ export default function Provider({
 
   const privyConfig = {
     bindings: {
-        getProvider: async ({chainId}: {chainId?: number}) => {
-            if (!currentWallet.current) throw new Error('No provider');
-            if (chainId) await currentWallet.current.switchChain(chainId);
-            const provider = await currentWallet.current.getEthersProvider();
-            return provider;
-        },
-        getSigner: async ({chainId}: {chainId?: number}) => {
-            if (!currentWallet.current) throw new Error('No signer');
-            if (chainId) await currentWallet.current.switchChain(chainId);
-            const provider = await currentWallet.current.getEthersProvider();
-            return await provider.getSigner();
-        }
+      getProvider: async ({chainId}: {chainId?: number}) => {
+        if (!currentWallet.current) throw new Error('No provider')
+        if (chainId) await currentWallet.current.switchChain(chainId)
+        const provider = await currentWallet.current.getEthersProvider()
+        return provider
+      },
+      getSigner: async ({chainId}: {chainId?: number}) => {
+        if (!currentWallet.current) throw new Error('No signer')
+        if (chainId) await currentWallet.current.switchChain(chainId)
+        const provider = await currentWallet.current.getEthersProvider()
+        return await provider.getSigner()
+      }
     },
     environment: production,
   }
@@ -76,5 +76,5 @@ export default function Provider({
       </LensProvider>
       </PrivyProvider>
     </WagmiConfig>
-  );
+  )
 }
