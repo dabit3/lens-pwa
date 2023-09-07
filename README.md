@@ -1,6 +1,8 @@
 ## PWA Lens Protocol example app
 
-A quick prototype combining Lens Protocol, WalletConnect, Privy, and ShadCN UI
+A boilerplate combining [Lens Protocol](https://www.lens.xyz/), [WalletConnect](https://walletconnect.com/), [Privy](https://www.privy.io/), and [ShadCN UI](https://ui.shadcn.com/)
+
+![Lens PWA Screenshot](header.png)
 
 ## Getting started
 
