@@ -2,7 +2,7 @@
 
 A boilerplate combining [Lens Protocol](https://www.lens.xyz/), [WalletConnect](https://walletconnect.com/), [Privy](https://www.privy.io/), and [ShadCN UI](https://ui.shadcn.com/)
 
-![Lens PWA Screenshot](header.png)
+![Lens PWA Screenshot](pwa-header.png)
 
 ## Getting started
 
