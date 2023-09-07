@@ -17,10 +17,22 @@ export default function Search() {
         href={`https://share.lens.xyz/u/${profile.handle}`}>
           <div className='border rounded-lg p-10'>
             <div>
-              <img
-                  src={profile?.picture?.original?.url}
-                  className='rounded w-[200px]'
-              />
+              {
+                profile.picture?.__typename === 'MediaSet' && (
+                  <img
+                    src={profile?.picture?.original?.url}
+                    className='rounded w-[200px]'
+                  />
+                )
+              }
+              {
+                profile.picture?.__typename === 'NftImage' && (
+                  <img
+                    src={profile?.picture?.uri}
+                    className='rounded w-[200px]'
+                  />
+                )
+              }
             </div>
             <div className='mt-4'>
               <p className='text-primary font-medium'>
