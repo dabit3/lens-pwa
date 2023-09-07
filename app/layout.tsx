@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import Link from 'next/link'
 import { ModeToggle } from '@/components/dropdown'
-import { ChevronRight, Droplets, LogOut, ArrowBigDownDash } from "lucide-react"
+import { ChevronRight, Tally3 as IconComponent, LogOut, ArrowBigDownDash } from "lucide-react"
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       <meta name="apple-mobile-web-app-title" content="Lens PWA" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" href="/images/icons/icon-512x512.png" />
+      <link rel="icon" href="/images/icons/iconmain-512x512.png" />
       <meta name="theme-color" content="#000000" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
@@ -102,8 +102,8 @@ function Nav() {
         py-3 px-4 flex flex-1 items-center p'
       >
         <Link href="/" className='mr-5 flex items-center'>
-          <Droplets className="opacity-85" size={19} />
-          <p className={`ml-2 mr-4 text-lg font-semibold`}>lenscn</p>
+          <IconComponent className="opacity-85" size={19} />
+          <p className={`ml-2 mr-4 text-lg font-semibold`}>lenspwa</p>
         </Link>
         <Link href="/" className={`mr-5 text-sm ${pathname !== '/' && 'opacity-50'}`}>
           <p>Home</p>

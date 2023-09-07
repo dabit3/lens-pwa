@@ -65,6 +65,10 @@ export default function Home() {
     }
     return true
   })
+
+  function openPublication(publication) {
+    window.open(`https://share.lens.xyz/p/${publication.id}`, '_blank')
+  }
   
   return (
     <main className="
@@ -72,21 +76,21 @@ export default function Home() {
       sm:px-10
     ">
       <div>
-        <a target="_blank" rel="no-opener" href="https://lens.xyz">
-        <div className="
-        flex
-        text-foreground mb-2">
+        {/* <a target="_blank" rel="no-opener" href="https://lens.xyz"> */}
           <div className="
-          cursor-pointer items-center 
-          flex grow-0 bg-secondary py-1 px-3 rounded-lg ">
-            <p className='mr-2'>📚</p>
-            <p className="text-sm">
-            Learn more about Lens Protocol.
-            </p>
-            <ArrowRight className='ml-2' size={14} />
+          flex
+          text-foreground mb-2">
+            <div className="
+            cursor-pointer items-center 
+            flex grow-0 bg-secondary py-1 px-3 rounded-lg ">
+              <p className='mr-2'>📚</p>
+              <p className="text-sm">
+              Learn more about Lens Protocol.
+              </p>
+              <ArrowRight className='ml-2' size={14} />
+            </div>
           </div>
-        </div>
-        </a>
+        {/* </a> */}
         <h1 className="text-5xl font-bold mt-3">
           Lens PWA 
         </h1>
@@ -135,7 +139,8 @@ export default function Home() {
         )
       }
       {
-        dashboardType === 'dashboard' && (      <div className='md:flex min-h-[300px] mt-3'>
+        dashboardType === 'dashboard' && (
+        <div className='md:flex min-h-[300px] mt-3'>
         <div className="border border rounded-tl rounded-bl md:w-[230px] pt-3 px-2 pb-8 flex-col flex">
           <p className='font-medium ml-4 mb-2 mt-1'>Social Views</p>
           <Button
@@ -218,42 +223,38 @@ export default function Home() {
                 {
                   publications?.map(publication => (
                     <div
+                    key={publication.id}
                     className="
                     space-y-3 mb-4 pt-6 pb-2
                     sm:px-6 px-2
+                    cursor-pointer
                     ">
-                      <a
-                        target="_blank"
-                        rel="no-opener"
-                        className="border-b"
-                        key={publication.id}
-                        href={`https://share.lens.xyz/p/${publication.id}`}
-                       >
-                      <div className="flex">
-                        <Avatar>
-                          <AvatarImage src={publication.profile?.picture?.original?.url} />
-                          <AvatarFallback>{publication.profile.handle.slice(0, 2)}</AvatarFallback>
-                        </Avatar>
-                        <div className="ml-4">
-                              <h3 className="mb-1 font-medium leading-none">{publication.profile.handle}</h3>
-                            <p className="text-xs text-muted-foreground">{publication.profile.name}</p>
+                      <div onClick={() => openPublication(publication)}>
+                        <div className="flex mb-3">
+                          <Avatar>
+                            <AvatarImage src={publication.profile?.picture?.original?.url} />
+                            <AvatarFallback>{publication.profile.handle.slice(0, 2)}</AvatarFallback>
+                          </Avatar>
+                          <div className="ml-4">
+                                <h3 className="mb-1 font-medium leading-none">{publication.profile.handle}</h3>
+                              <p className="text-xs text-muted-foreground">{publication.profile.name}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <img
+                            className={cn(`
+                            max-w-full sm:max-w-[500px]
+                            rounded-2xl h-auto object-cover transition-all hover:scale-105
+                            `)}
+                            src={publication.__typename === 'Post' ? publication.metadata?.media[0]?.original.url : ''}
+                          />
+                          <ReactMarkdown className="
+                          mt-4 break-words
+                          ">
+                            {publication.metadata.content.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '[LINK]($1)')}
+                          </ReactMarkdown>
                         </div>
                       </div>
-                      <div>
-                        <img
-                          className={cn(`
-                          max-w-full sm:max-w-[500px]
-                          rounded-2xl h-auto object-cover transition-all hover:scale-105
-                          `)}
-                          src={publication.__typename === 'Post' ? publication.metadata?.media[0]?.original.url : ''}
-                        />
-                        <ReactMarkdown className="
-                        mt-4 break-words
-                        ">
-                          {publication.metadata.content.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '[LINK]($1)')}
-                        </ReactMarkdown>
-                      </div>
-                      </a>
                       <Reactions
                         publication={publication}
                         profile={profile}
@@ -349,12 +350,26 @@ function Reactions({
     profileId: profile.id
   })
 
-  async function likePublication(publication) {
+  const reactionType = ReactionType.UPVOTE;
+  const hasReactionType = hasReaction({
+    reactionType,
+    publication,
+  });
+  console.log('hasReactionType: ', hasReactionType)
+
+  async function likePublication() {
     if (!profile) return
-    addReaction({
-      reactionType: ReactionType.UPVOTE,
-      publication
-    })
+    if (hasReactionType) {
+      await removeReaction({
+        reactionType,
+        publication,
+      });
+    } else {
+      await addReaction({
+        reactionType,
+        publication,
+      });
+    }
   }
   return (
     <div>
@@ -367,8 +382,8 @@ function Reactions({
         {publication.stats.totalAmountOfMirrors}
       </Button>
       <Button
-      onClick={publication => likePublication(publication)}
-      className="rounded-full mr-1" variant="secondary">
+        onClick={likePublication}
+        className="rounded-full mr-1" variant="secondary">
         <Heart className="mr-2 h-4 w-4" />
         {publication.stats.totalUpvotes}
       </Button>
