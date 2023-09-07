@@ -1,8 +1,6 @@
-## ShadCN + Lens Protocol example app
+## PWA Lens Protocol example app
 
-A quick prototype combining Lens Protocol + ShadCN UI
-
-I will continue iterating on and improving this in the future.
+A quick prototype combining Lens Protocol, WalletConnect, Privy, and ShadCN UI
 
 ## Getting started
 
@@ -18,7 +16,15 @@ git clone git@github.com:dabit3/lens-shadcn.git
 npm install # or yarn, etc..
 ```
 
-3. Run the app
+3. Configure environment variables for WalletConnect & Privy
+
+```sh
+# rename .example.env.local to .env.local 
+NEXT_PUBLIC_WC_ID=
+NEXT_PUBLIC_PRIVY_APP_ID=
+```
+
+4. Run the app
 
 ```sh
 npm run dev
