@@ -1,12 +1,13 @@
-"use client"
-import "./globals.css"
-import { polygonMumbai, polygon } from "wagmi/chains"
-import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import { publicProvider } from "wagmi/providers/public"
-import { InjectedConnector } from "wagmi/connectors/injected"
-import { LensProvider, production, development } from "@lens-protocol/react-web"
-import { PrivyProvider, ConnectedWallet, useWallets } from '@privy-io/react-auth'
+'use client'
+import './globals.css'
+import { polygonMumbai, polygon } from 'wagmi/chains'
+import { configureChains, createConfig, WagmiConfig } from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { LensProvider, production } from '@lens-protocol/react-web'
+import { ConnectedWallet, useWallets } from '@privy-io/react-auth'
 import { useRef } from 'react'
+import { useEffect } from 'react'
 
 const { publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai, polygon],
@@ -26,14 +27,15 @@ const config = createConfig({
   ]
 })
 
-export default function Provider({
-  children, handleLogin
-}: {
+export default function Provider({ children }: {
   children: React.ReactNode
-  handleLogin: (user: any) => void;
 }) {
   const { wallets } = useWallets()
   const currentWallet = useRef<ConnectedWallet | null>(wallets[0] || null)
+
+  useEffect(() => {
+    currentWallet.current = wallets[0] || null;
+  }, [wallets])
 
   const privyConfig = {
     bindings: {
@@ -50,31 +52,15 @@ export default function Provider({
         return await provider.getSigner()
       }
     },
-    environment: production,
+    environment: production
   }
 
   return (
     <WagmiConfig config={config}>
-      <PrivyProvider
-        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
-        onSuccess={handleLogin}
-        config={{
-          loginMethods: ['email', 'wallet', 'google', 'apple'],
-          appearance: {
-            theme: 'dark',
-            accentColor: '#676FFF',
-            logo: 'https://i.imgur.com/tzKMWv9.png',
-          },
-          embeddedWallets: {
-            createOnLogin: 'all-users',
-            noPromptOnSignature: true
-          }
-        }}
-      >
       <LensProvider config={privyConfig}>
         {children}
       </LensProvider>
-      </PrivyProvider>
     </WagmiConfig>
   )
 }
+

@@ -1,15 +1,28 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
 import {
   useExploreProfiles,
-  useExplorePublications, PublicationTypes, PublicationSortCriteria,
-  PublicationMainFocus
+  useExplorePublications,
+  PublicationTypes,
+  PublicationSortCriteria,
+  PublicationMainFocus,
+  useReaction,
+  useActiveProfile,
+  ReactionType
 } from '@lens-protocol/react-web'
 import {
-  Loader2, ListMusic, Newspaper,
-  PersonStanding, Shapes, Share, Globe,
-  MessageSquare, Repeat2, Heart, Grab, ArrowRight
+  Loader2,
+  ListMusic,
+  Newspaper,
+  PersonStanding,
+  Shapes,
+  Share,
+  Globe,
+  MessageSquare,
+  Repeat2,
+  Heart,
+  Grab,
+  ArrowRight
 } from "lucide-react"
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from "@/lib/utils"
@@ -19,11 +32,13 @@ import ReactMarkdown from 'react-markdown'
 export default function Home() {
   const [view, setView] = useState('profiles')
   const [dashboardType, setDashboardType] = useState('dashboard')
-  let { data: profiles, error: profileError, loading: loadingProfiles } = useExploreProfiles({
+  let { data: profiles, loading: loadingProfiles } = useExploreProfiles({
     limit: 50
   }) as any
 
-  let { data: musicPubs, error: musicPubError, loading: loadingMusicPubs } = useExplorePublications({
+  const { data: profile } = useActiveProfile()
+
+  let { data: musicPubs, loading: loadingMusicPubs } = useExplorePublications({
     limit: 25,
     sortCriteria: PublicationSortCriteria.CuratedProfiles,
     publicationTypes: [PublicationTypes.Post],
@@ -32,7 +47,7 @@ export default function Home() {
     }
   }) as any
 
-  let { data: publications, error: pubError, loading: loadingPubs } = useExplorePublications({
+  let { data: publications, loading: loadingPubs } = useExplorePublications({
     limit: 25,
     sortCriteria: PublicationSortCriteria.CuratedProfiles,
     publicationTypes: [PublicationTypes.Post],
@@ -79,13 +94,16 @@ export default function Home() {
           An application boilerplate built with a modern stack. Simple to get started building your first social app. Leveraging ShadCN, Lens Protocol, Next.js, and WalletConnect.
         </p>
         <div className="mt-6 flex">
-          <Button variant="secondary" className='mr-3'>
+          <Button variant="outline" className='mr-3'>
             <Share className="h-4 w-4 mr-1" />
             Share
           </Button>
-          <a target="_blank" rel="no-opener" href="https://aave.notion.site/08521d6d8ec84d10bf0f6d03abcf60cc?v=eb989b589d7447918187bf3c588a2748&pvs=4" className={buttonVariants({ variant: "outline" })}>
-            <Globe className="h-4 w-4 mr-1" />
-            Explore Lens Apps
+          <a
+            target="_blank"
+            rel="no-opener" href="https://aave.notion.site/08521d6d8ec84d10bf0f6d03abcf60cc?v=eb989b589d7447918187bf3c588a2748&pvs=4"
+            className={buttonVariants({ variant: "default" })}>
+            <Globe className="h-4 w-4 mr-1 text-white" />
+            <p className="text-white">Explore Lens Apps</p>
           </a>
         </div>
       </div>
@@ -104,7 +122,7 @@ export default function Home() {
           variant="ghost"
           onClick={() => setDashboardType('algorithms')}
           className={
-            `${dashboardType !== 'recommendation algorithms' ? 'opacity-50' : '' }`
+            `${dashboardType !== 'algorithms' ? 'opacity-50' : '' }`
           }>Choose your algorithm</Button>
         </div>
       </div>
@@ -199,62 +217,48 @@ export default function Home() {
                 }
                 {
                   publications?.map(publication => (
-                    <a
-                      target="_blank"
-                      rel-no-opener
-                      className="border-b"
-                      key={publication.id}
-                      href={`https://share.lens.xyz/p/${publication.id}`}
-                    >
-                      <div
-                      className="
-                      space-y-3 mb-4 pt-6 pb-2
-                      sm:px-6 px-2
-                      ">
-                        <div className="flex">
-                          <Avatar>
-                            <AvatarImage src={publication.profile?.picture?.original?.url} />
-                            <AvatarFallback>{publication.profile.handle.slice(0, 2)}</AvatarFallback>
-                          </Avatar>
-                          <div className="ml-4">
-                               <h3 className="mb-1 font-medium leading-none">{publication.profile.handle}</h3>
-                              <p className="text-xs text-muted-foreground">{publication.profile.name}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <img
-                            className={cn(`
-                            max-w-full sm:max-w-[500px]
-                            rounded-2xl h-auto object-cover transition-all hover:scale-105
-                            `)}
-                            src={publication.__typename === 'Post' ? publication.metadata?.media[0]?.original.url : ''}
-                          />
-                          <ReactMarkdown className="
-                          mt-4 break-words
-                          ">
-                            {publication.metadata.content.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '[LINK]($1)')}
-                          </ReactMarkdown>
-                        </div>
-                        <div>
-                          <Button className="rounded-full mr-1"  variant="secondary" >
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            {publication.stats.totalAmountOfComments}
-                          </Button>
-                          <Button className="rounded-full mr-1" variant="secondary">
-                            <Repeat2 className="mr-2 h-4 w-4" />
-                            {publication.stats.totalAmountOfMirrors}
-                          </Button>
-                          <Button className="rounded-full mr-1" variant="secondary">
-                            <Heart className="mr-2 h-4 w-4" />
-                            {publication.stats.totalUpvotes}
-                          </Button>
-                          <Button className="rounded-full mr-1" variant="secondary">
-                            <Grab className="mr-2 h-4 w-4" />
-                            {publication.stats.totalAmountOfCollects}
-                          </Button>
+                    <div
+                    className="
+                    space-y-3 mb-4 pt-6 pb-2
+                    sm:px-6 px-2
+                    ">
+                      <a
+                        target="_blank"
+                        rel="no-opener"
+                        className="border-b"
+                        key={publication.id}
+                        href={`https://share.lens.xyz/p/${publication.id}`}
+                       >
+                      <div className="flex">
+                        <Avatar>
+                          <AvatarImage src={publication.profile?.picture?.original?.url} />
+                          <AvatarFallback>{publication.profile.handle.slice(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <div className="ml-4">
+                              <h3 className="mb-1 font-medium leading-none">{publication.profile.handle}</h3>
+                            <p className="text-xs text-muted-foreground">{publication.profile.name}</p>
                         </div>
                       </div>
-                    </a>
+                      <div>
+                        <img
+                          className={cn(`
+                          max-w-full sm:max-w-[500px]
+                          rounded-2xl h-auto object-cover transition-all hover:scale-105
+                          `)}
+                          src={publication.__typename === 'Post' ? publication.metadata?.media[0]?.original.url : ''}
+                        />
+                        <ReactMarkdown className="
+                        mt-4 break-words
+                        ">
+                          {publication.metadata.content.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, '[LINK]($1)')}
+                        </ReactMarkdown>
+                      </div>
+                      </a>
+                      <Reactions
+                        publication={publication}
+                        profile={profile}
+                      />
+                    </div>
                   ))
                 }
               </div>
@@ -334,8 +338,44 @@ export default function Home() {
         </div>
       </div>)
       }
-
-
     </main>
+  )
+}
+
+function Reactions({
+  publication, profile
+}) {
+  const { addReaction, removeReaction, hasReaction, isPending } = useReaction({
+    profileId: profile.id
+  })
+
+  async function likePublication(publication) {
+    if (!profile) return
+    addReaction({
+      reactionType: ReactionType.UPVOTE,
+      publication
+    })
+  }
+  return (
+    <div>
+      <Button className="rounded-full mr-1"  variant="secondary" >
+        <MessageSquare className="mr-2 h-4 w-4" />
+        {publication.stats.totalAmountOfComments}
+      </Button>
+      <Button className="rounded-full mr-1" variant="secondary">
+        <Repeat2 className="mr-2 h-4 w-4" />
+        {publication.stats.totalAmountOfMirrors}
+      </Button>
+      <Button
+      onClick={publication => likePublication(publication)}
+      className="rounded-full mr-1" variant="secondary">
+        <Heart className="mr-2 h-4 w-4" />
+        {publication.stats.totalUpvotes}
+      </Button>
+      <Button className="rounded-full mr-1" variant="secondary">
+        <Grab className="mr-2 h-4 w-4" />
+        {publication.stats.totalAmountOfCollects}
+      </Button>
+    </div>
   )
 }

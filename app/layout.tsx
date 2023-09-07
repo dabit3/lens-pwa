@@ -6,56 +6,67 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Link from 'next/link'
 import { ModeToggle } from '@/components/dropdown'
 import { ChevronRight, Droplets, LogOut, ArrowBigDownDash } from "lucide-react"
-import LensProvider from './lens-provider'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
-import { useWalletLogin } from '@lens-protocol/react-web'
 import { usePrivy } from '@privy-io/react-auth'
 import { useState, useEffect } from 'react'
-import { isSafari } from 'react-device-detect'
+import { useWalletLogin } from '@lens-protocol/react-web';
+import { useLogin } from '@privy-io/react-auth';
+import { useWallets } from '@privy-io/react-auth'
+import LensProvider from './LensProvider'
+import PrivyProvider from './PrivyProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({ children }) {
-  const handleLogin = (user) => {
-    console.log('user; ', user)
-    window.scrollTo({top: 0, behavior: 'smooth'})
-  }
   return (
     <html lang="en">
-    {/* PWA config */}
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
-    <meta name="apple-mobile-web-app-title" content="Lens PWA" />
+      {/* PWA config */}
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
+      <meta name="apple-mobile-web-app-title" content="Lens PWA" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" href="/images/icons/icon-512x512.png" />
+      <meta name="theme-color" content="#000000" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/images/icons/icon-512x512.png" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
-    <body className={inter.className}>
-      <LensProvider
-        handleLogin={handleLogin}
-      >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Nav />
-          {children}
-        </ThemeProvider>
-      </LensProvider>
-    </body>
+      <body className={inter.className}>
+        <PrivyProvider>
+          <LensProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <Nav />
+              {children}
+            </ThemeProvider>
+          </LensProvider>
+        </PrivyProvider>
+      </body>
     </html>
   )
 }
 
 function Nav() {
   const pathname = usePathname()
-  const { execute: loginWithLens } = useWalletLogin();
-  const { login, logout, user } = usePrivy()
-
+  const { logout, user } = usePrivy()
   const [isInstalled, setIsInstalled] = useState(true)
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
+  const { execute: loginWithLens } = useWalletLogin()
+  const { wallets } = useWallets()
+
+  const { login } = useLogin({
+    onComplete: async user => {
+      console.log('wallets in useLogin: ', wallets)
+      // if (!wallets[0]) return
+      if (!user.wallet) return
+      console.log('user: ', user)
+      const loggedIn = await loginWithLens({
+        // address: wallets[0].address,
+        address: user.wallet?.address
+      })
+      console.log('loggedIn: ', loggedIn)
+    }
+  })
 
   useEffect( () => {
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -67,17 +78,16 @@ function Nav() {
 
   async function addToHomeScreen() {
     if (!deferredPrompt) return
-    deferredPrompt.prompt();
+    deferredPrompt.prompt()
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the A2HS prompt')
         setIsInstalled(true)
       } else {
-        console.log('User dismissed the A2HS prompt');
+        console.log('User dismissed the A2HS prompt')
       }
-      setDeferredPrompt(null);
+      setDeferredPrompt(null)
     })
-  };
+  }
   
   return (
     <nav className='
@@ -117,7 +127,7 @@ function Nav() {
         {
           !user && (
             <Button onClick={login} variant="secondary" className="mr-2">
-              Sign In
+              Connect Wallet
               <ChevronRight className="h-4 w-4" />
             </Button>
           )
@@ -131,7 +141,7 @@ function Nav() {
         {
           user && (
             <Button onClick={logout} variant="secondary" className="mr-4">
-            Sign out
+            Disconnect
             <LogOut className="h-4 w-4 ml-3" />
           </Button>
           )
