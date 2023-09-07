@@ -65,6 +65,7 @@ function Nav() {
         address: user.wallet?.address
       })
       console.log('loggedIn: ', loggedIn)
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   })
 
