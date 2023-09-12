@@ -2,19 +2,23 @@
 
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from "@/components/theme-provider"
 import Link from 'next/link'
 import { ModeToggle } from '@/components/dropdown'
 import { ChevronRight, Tally3 as IconComponent, LogOut, ArrowBigDownDash } from "lucide-react"
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
-import { usePrivy } from '@privy-io/react-auth'
 import { useState, useEffect } from 'react'
-import { useWalletLogin } from '@lens-protocol/react-web';
-import { useLogin } from '@privy-io/react-auth';
-import { useWallets } from '@privy-io/react-auth'
-import LensProvider from './LensProvider'
-import PrivyProvider from './PrivyProvider'
+import {
+  useWalletLogin,
+  useActiveProfile,
+  useWalletLogout
+} from '@lens-protocol/react-web'
+import { Web3ModalProvider } from "@/components/web3modal-provider"
+import { ThemeProvider } from "@/components/theme-provider"
+import { LensProvider } from "@/components/lens-provider"
+import { useWeb3Modal } from '@web3modal/react'
+import { useAccount, useConnect, useDisconnect, useFeeData } from 'wagmi'
+import { InjectedConnector } from "wagmi/connectors/injected"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,16 +35,15 @@ export default function RootLayout({ children }) {
       <link rel="icon" href="/images/icons/iconmain-512x512.png" />
       <meta name="theme-color" content="#000000" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-
       <body className={inter.className}>
-        <PrivyProvider>
+        <Web3ModalProvider>
           <LensProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Nav />
               {children}
             </ThemeProvider>
           </LensProvider>
-        </PrivyProvider>
+        </Web3ModalProvider>
       </body>
     </html>
   )
@@ -48,28 +51,63 @@ export default function RootLayout({ children }) {
 
 function Nav() {
   const pathname = usePathname()
-  const { logout, user } = usePrivy()
   const [isInstalled, setIsInstalled] = useState(true)
+  const [isManuallyConnected, setIsManuallyConnected] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
-  const { execute: loginWithLens } = useWalletLogin()
-  const { wallets } = useWallets()
+  const { execute } = useWalletLogin()
+  const { execute: logoutLens } = useWalletLogout()
+  const { open, close } = useWeb3Modal()
+  const { address, isConnected } = useAccount()
+  const { data: wallet } = useActiveProfile()
 
-  const { login } = useLogin({
-    onComplete: async user => {
-      console.log('wallets in useLogin: ', wallets)
-      // if (!wallets[0]) return
-      if (!user.wallet) return
-      console.log('user: ', user)
-      const loggedIn = await loginWithLens({
-        // address: wallets[0].address,
-        address: user.wallet?.address
-      })
-      console.log('loggedIn: ', loggedIn)
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }
+  const { disconnectAsync, disconnect } = useDisconnect()
+  const { connectAsync } = useConnect({
+    connector: new InjectedConnector()
   })
 
-  useEffect( () => {
+  useEffect(() => {
+    if (!wallet && address && !isManuallyConnected) {
+      loginWithLens()
+    }
+  }, [address])
+
+  async function loginWithLens() {
+    try {
+      setIsManuallyConnected(true)
+      if (isConnected) {
+        await disconnectAsync()
+      }
+      const { connector } = await connectAsync()
+      if (connector instanceof InjectedConnector) {
+        const walletClient = await connector.getWalletClient()
+        await execute({
+          address: walletClient.account.address,
+        })
+      }
+    } catch (err) {
+      console.log('error: ', err)
+    }
+  }
+
+  async function login() {
+    try {
+      open()
+    } catch (err) {
+      console.log('error:', err)
+      close()
+    }
+  }
+
+  async function logout() {
+    try {
+      await logoutLens()
+      disconnect()
+    } catch (err) {
+      console.log('error:', err)
+    }
+  }
+
+  useEffect(() => {
     window.addEventListener('beforeinstallprompt', (e) => {
       setIsInstalled(false)
       e.preventDefault()
@@ -113,7 +151,7 @@ function Nav() {
           <p>Search</p>
         </Link>
         {
-          user && (
+          wallet && (
             <Link href="/profile" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
               <p>Profile</p>
             </Link>
@@ -126,9 +164,17 @@ function Nav() {
         pl-4 pb-3 sm:p-0
       '>
         {
-          !user && (
+          !address && !wallet && (
             <Button onClick={login} variant="secondary" className="mr-2">
               Connect Wallet
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )
+        }
+       {
+          !wallet && address && (
+            <Button onClick={loginWithLens} variant="secondary" className="mr-2">
+              Sign in with Lens
               <ChevronRight className="h-4 w-4" />
             </Button>
           )
@@ -140,7 +186,7 @@ function Nav() {
           </Button>
         )}
         {
-          user && (
+          wallet && (
             <Button onClick={logout} variant="secondary" className="mr-4">
             Disconnect
             <LogOut className="h-4 w-4 ml-3" />

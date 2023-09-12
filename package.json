@@ -9,9 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@lens-protocol/react-web": "^1.2.2",
-    "@lens-protocol/wagmi": "^2.0.2",
-    "@privy-io/react-auth": "^1.34.1",
+    "@lens-protocol/react-web": "^1.3.0",
+    "@lens-protocol/wagmi": "^2.1.0",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
     "@radix-ui/react-slot": "^1.0.2",

@@ -8,7 +8,7 @@ import {
   PublicationMainFocus,
   useReaction,
   useActiveProfile,
-  ReactionType
+  ReactionTypes
 } from '@lens-protocol/react-web'
 import {
   Loader2,
@@ -350,12 +350,11 @@ function Reactions({
     profileId: profile.id
   })
 
-  const reactionType = ReactionType.UPVOTE;
+  const reactionType = ReactionTypes.Upvote;
   const hasReactionType = hasReaction({
     reactionType,
     publication,
   });
-  console.log('hasReactionType: ', hasReactionType)
 
   async function likePublication() {
     if (!profile) return
