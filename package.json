@@ -18,6 +18,7 @@
     "@types/node": "20.5.0",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
+    "@vercel/blob": "^0.12.5",
     "@vercel/kv": "^0.2.3",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
