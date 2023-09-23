@@ -5,16 +5,16 @@ import { useWallets } from '@privy-io/react-auth';
 const CreatorDetail = ({ params }: { params: { id: string } }) => {
   const router = usePathname();
   console.log(router);
-  const id = router?.split('/')[2]; // Get the creator ID from the URL
+  // const id = router?.split('/')[2]; // Get the creator ID from the URL
   const { wallets } = useWallets();
   const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
 
   // Replace this with your creator data retrieval logic based on the ID
   // For this example, we'll use dummy data again.
   const creator = {
-    id,
-    name: `Creator ${id}`,
-    description: `Description for Creator ${id}`,
+    id: params.id,
+    name: `Creator ${params.id}`,
+    description: `Description for Creator ${params.id}`,
   };
 
   return (
