@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import {User} from "@/app/api/models/users";
+import {Writable} from "stream";
 
 let users: User[] = []; // mock data store.
 
@@ -18,23 +19,26 @@ export function GET(request: NextRequest) {
     );
 }
 
-// export function POST(request: NextRequest) {
-//     const name = request.body?.name;
-//     const email = request.body?.email;
-//
-//     if (name && email) {
-//         const user: User = {
-//             id: Date.now(),
-//             name,
-//             email,
-//         };
-//         users.push(user);
-//     } else {
-//         return NextResponse.json({ message: 'Invalid request body.' }, { status: 400 });
-//     }
-//
-//
-//     users.push(user);
-//
-//     return NextResponse.json(user, { status: 201 });
-// }
+export async function POST(request: NextRequest) {
+    const data = await request.text();
+
+    let parsedBody;
+    try {
+        parsedBody = JSON.parse(data);
+    } catch (error) {
+        return NextResponse.json({ message: 'Invalid JSON in request body.' }, { status: 400 });
+    }
+
+    if (!parsedBody.walletAddress || !parsedBody.contractAddress) {
+        return NextResponse.json({ message: 'Missing walletAddress or contractAddress.' }, { status: 400 });
+    }
+
+    const newUser: User = {
+        id: Date.now(),
+        walletAddress: parsedBody.walletAddress,
+        contractAddress: parsedBody.contractAddress,
+    };
+
+    users.push(newUser);
+    return NextResponse.json(newUser, { status: 201 });
+}
