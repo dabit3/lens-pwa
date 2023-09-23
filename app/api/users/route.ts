@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import {User} from "@/app/api/models/users";
-import {Writable} from "stream";
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 let users: User[] = []; // mock data store.
 
