@@ -1,6 +1,8 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
+import {foundry, localhost} from '@wagmi/chains';
+
 
 export default function Provider({
   children
@@ -19,11 +21,12 @@ export default function Provider({
             createOnLogin: 'all-users',
             noPromptOnSignature: false
           },
-          rpcConfig: {
-            rpcUrls: {
-              1337 : "http://127.0.0.1:8545",
-          }
-          },
+          // rpcConfig: {
+          //   rpcUrls: {
+          //     1337 : "http://127.0.0.1:8545",
+          // }
+          // },
+          additionalChains: [foundry, localhost]
         }}>
            {children}
       </PrivyProvider>
