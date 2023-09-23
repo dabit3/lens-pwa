@@ -17,8 +17,13 @@ export default function Provider({
           },
           embeddedWallets: {
             createOnLogin: 'all-users',
-            noPromptOnSignature: true
+            noPromptOnSignature: false
+          },
+          rpcConfig: {
+            rpcUrls: {
+              1337 : "http://127.0.0.1:8545",
           }
+          },
         }}>
            {children}
       </PrivyProvider>

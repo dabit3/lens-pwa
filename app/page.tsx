@@ -28,6 +28,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import ReactMarkdown from 'react-markdown'
+import {useWallets} from '@privy-io/react-auth';
 
 export default function Home() {
   const [view, setView] = useState('profiles')
@@ -69,6 +70,14 @@ export default function Home() {
   function openPublication(publication) {
     window.open(`https://share.lens.xyz/p/${publication.id}`, '_blank')
   }
+
+  const {wallets} = useWallets();
+  const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
+  const embeddedWalletAddress = embeddedWallet?.address;
+
+
+
+
   
   return (
     <main className="
@@ -76,6 +85,18 @@ export default function Home() {
       sm:px-10
     ">
       <div>
+      <div className="
+          flex
+          text-foreground mb-2">
+            <div className="
+            cursor-pointer items-center 
+            flex grow-0 bg-secondary py-1 px-3 rounded-lg ">
+              <p className="text-sm">
+              {embeddedWalletAddress ? embeddedWalletAddress : "Connect Wallet"}
+              </p>
+            </div>
+          </div>
+
         {/* <a target="_blank" rel="no-opener" href="https://lens.xyz"> */}
           <div className="
           flex
