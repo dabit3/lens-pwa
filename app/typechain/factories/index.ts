@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { ShareSample__factory } from "./ShareSample__factory";
+export { ShareSampleFactory__factory } from "./ShareSampleFactory__factory";

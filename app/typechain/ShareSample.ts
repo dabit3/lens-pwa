@@ -3,29 +3,50 @@
 /* eslint-disable */
 import type {
   BaseContract,
+  BigNumber,
   BigNumberish,
   BytesLike,
-  FunctionFragment,
-  Result,
-  Interface,
-  EventFragment,
-  AddressLike,
-  ContractRunner,
-  ContractMethod,
-  Listener,
+  CallOverrides,
+  ContractTransaction,
+  Overrides,
+  PayableOverrides,
+  PopulatedTransaction,
+  Signer,
+  utils,
 } from "ethers";
 import type {
-  TypedContractEvent,
-  TypedDeferredTopicFilter,
-  TypedEventLog,
-  TypedLogDescription,
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type {
+  TypedEventFilter,
+  TypedEvent,
   TypedListener,
-  TypedContractMethod,
+  OnEvent,
 } from "./common";
 
-export interface ShareSampleInterface extends Interface {
+export interface ShareSampleInterface extends utils.Interface {
+  functions: {
+    "buyShares(uint256)": FunctionFragment;
+    "decreaseSubscriptionPool(uint256,uint256)": FunctionFragment;
+    "getBuyPrice(uint256)": FunctionFragment;
+    "getCurrentPrice()": FunctionFragment;
+    "getMinimumSubPool()": FunctionFragment;
+    "getPrice(uint256,uint256)": FunctionFragment;
+    "getSellPrice(uint256)": FunctionFragment;
+    "getSubscriptionPoolRemaining()": FunctionFragment;
+    "getSupply()": FunctionFragment;
+    "increaseSubscriptionPool(uint256,uint256)": FunctionFragment;
+    "reapAndWithdrawFees(uint256[])": FunctionFragment;
+    "reapSafForTokenIds(uint256[])": FunctionFragment;
+    "sellShares(uint256)": FunctionFragment;
+    "withdrawAccumulatedFees()": FunctionFragment;
+  };
+
   getFunction(
-    nameOrSignature:
+    nameOrSignatureOrTopic:
       | "buyShares"
       | "decreaseSubscriptionPool"
       | "getBuyPrice"
@@ -36,14 +57,11 @@ export interface ShareSampleInterface extends Interface {
       | "getSubscriptionPoolRemaining"
       | "getSupply"
       | "increaseSubscriptionPool"
-      | "ping"
       | "reapAndWithdrawFees"
       | "reapSafForTokenIds"
       | "sellShares"
       | "withdrawAccumulatedFees"
   ): FunctionFragment;
-
-  getEvent(nameOrSignatureOrTopic: "FeeCollected" | "Trade"): EventFragment;
 
   encodeFunctionData(
     functionFragment: "buyShares",
@@ -82,7 +100,6 @@ export interface ShareSampleInterface extends Interface {
     functionFragment: "increaseSubscriptionPool",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "ping", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "reapAndWithdrawFees",
     values: [BigNumberish[]]
@@ -131,7 +148,6 @@ export interface ShareSampleInterface extends Interface {
     functionFragment: "increaseSubscriptionPool",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ping", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "reapAndWithdrawFees",
     data: BytesLike
@@ -145,255 +161,403 @@ export interface ShareSampleInterface extends Interface {
     functionFragment: "withdrawAccumulatedFees",
     data: BytesLike
   ): Result;
+
+  events: {
+    "FeeCollected(uint256,uint256,uint256,uint256)": EventFragment;
+    "Trade(address,address,bool,uint256,uint256,uint256)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "FeeCollected"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Trade"): EventFragment;
 }
 
-export namespace FeeCollectedEvent {
-  export type InputTuple = [
-    tokenId: BigNumberish,
-    feeCollected: BigNumberish,
-    subscriptionPoolRemaining: BigNumberish,
-    liquidationStartedAt: BigNumberish
-  ];
-  export type OutputTuple = [
-    tokenId: bigint,
-    feeCollected: bigint,
-    subscriptionPoolRemaining: bigint,
-    liquidationStartedAt: bigint
-  ];
-  export interface OutputObject {
-    tokenId: bigint;
-    feeCollected: bigint;
-    subscriptionPoolRemaining: bigint;
-    liquidationStartedAt: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export interface FeeCollectedEventObject {
+  tokenId: BigNumber;
+  feeCollected: BigNumber;
+  subscriptionPoolRemaining: BigNumber;
+  liquidationStartedAt: BigNumber;
 }
+export type FeeCollectedEvent = TypedEvent<
+  [BigNumber, BigNumber, BigNumber, BigNumber],
+  FeeCollectedEventObject
+>;
 
-export namespace TradeEvent {
-  export type InputTuple = [
-    trader: AddressLike,
-    subject: AddressLike,
-    isBuy: boolean,
-    shareAmount: BigNumberish,
-    ethAmount: BigNumberish,
-    supply: BigNumberish
-  ];
-  export type OutputTuple = [
-    trader: string,
-    subject: string,
-    isBuy: boolean,
-    shareAmount: bigint,
-    ethAmount: bigint,
-    supply: bigint
-  ];
-  export interface OutputObject {
-    trader: string;
-    subject: string;
-    isBuy: boolean;
-    shareAmount: bigint;
-    ethAmount: bigint;
-    supply: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export type FeeCollectedEventFilter = TypedEventFilter<FeeCollectedEvent>;
+
+export interface TradeEventObject {
+  trader: string;
+  subject: string;
+  isBuy: boolean;
+  shareAmount: BigNumber;
+  ethAmount: BigNumber;
+  supply: BigNumber;
 }
+export type TradeEvent = TypedEvent<
+  [string, string, boolean, BigNumber, BigNumber, BigNumber],
+  TradeEventObject
+>;
+
+export type TradeEventFilter = TypedEventFilter<TradeEvent>;
 
 export interface ShareSample extends BaseContract {
-  connect(runner?: ContractRunner | null): ShareSample;
-  waitForDeployment(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this;
+  attach(addressOrName: string): this;
+  deployed(): Promise<this>;
 
   interface: ShareSampleInterface;
 
-  queryFilter<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+  queryFilter<TEvent extends TypedEvent>(
+    event: TypedEventFilter<TEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
-  queryFilter<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  ): Promise<Array<TEvent>>;
 
-  on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  on<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  listeners<TEvent extends TypedEvent>(
+    eventFilter?: TypedEventFilter<TEvent>
+  ): Array<TypedListener<TEvent>>;
+  listeners(eventName?: string): Array<Listener>;
+  removeAllListeners<TEvent extends TypedEvent>(
+    eventFilter: TypedEventFilter<TEvent>
+  ): this;
+  removeAllListeners(eventName?: string): this;
+  off: OnEvent<this>;
+  on: OnEvent<this>;
+  once: OnEvent<this>;
+  removeListener: OnEvent<this>;
 
-  once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  once<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  functions: {
+    buyShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
-  ): Promise<Array<TypedListener<TCEvent>>>;
-  listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+    decreaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  buyShares: TypedContractMethod<[amount: BigNumberish], [void], "payable">;
+    getBuyPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-  decreaseSubscriptionPool: TypedContractMethod<
-    [tokenId: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+    getCurrentPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-  getBuyPrice: TypedContractMethod<[amount: BigNumberish], [bigint], "view">;
+    getMinimumSubPool(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-  getCurrentPrice: TypedContractMethod<[], [bigint], "view">;
+    getPrice(
+      _supply: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-  getMinimumSubPool: TypedContractMethod<[], [bigint], "view">;
+    getSellPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-  getPrice: TypedContractMethod<
-    [_supply: BigNumberish, amount: BigNumberish],
-    [bigint],
-    "view"
-  >;
+    getSubscriptionPoolRemaining(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-  getSellPrice: TypedContractMethod<[amount: BigNumberish], [bigint], "view">;
+    getSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-  getSubscriptionPoolRemaining: TypedContractMethod<[], [bigint], "view">;
+    increaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  getSupply: TypedContractMethod<[], [bigint], "view">;
+    reapAndWithdrawFees(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  increaseSubscriptionPool: TypedContractMethod<
-    [tokenId: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+    reapSafForTokenIds(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  ping: TypedContractMethod<[], [bigint], "payable">;
+    sellShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<ContractTransaction>;
 
-  reapAndWithdrawFees: TypedContractMethod<
-    [tokenIds: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
+    withdrawAccumulatedFees(
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+  };
 
-  reapSafForTokenIds: TypedContractMethod<
-    [tokenIds: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
+  buyShares(
+    amount: BigNumberish,
+    overrides?: PayableOverrides & { from?: string }
+  ): Promise<ContractTransaction>;
 
-  sellShares: TypedContractMethod<[amount: BigNumberish], [void], "payable">;
+  decreaseSubscriptionPool(
+    tokenId: BigNumberish,
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
 
-  withdrawAccumulatedFees: TypedContractMethod<[], [void], "nonpayable">;
+  getBuyPrice(
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getCurrentPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getFunction(
-    nameOrSignature: "buyShares"
-  ): TypedContractMethod<[amount: BigNumberish], [void], "payable">;
-  getFunction(
-    nameOrSignature: "decreaseSubscriptionPool"
-  ): TypedContractMethod<
-    [tokenId: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "getBuyPrice"
-  ): TypedContractMethod<[amount: BigNumberish], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getCurrentPrice"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getMinimumSubPool"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getPrice"
-  ): TypedContractMethod<
-    [_supply: BigNumberish, amount: BigNumberish],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getSellPrice"
-  ): TypedContractMethod<[amount: BigNumberish], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getSubscriptionPoolRemaining"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getSupply"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "increaseSubscriptionPool"
-  ): TypedContractMethod<
-    [tokenId: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "ping"
-  ): TypedContractMethod<[], [bigint], "payable">;
-  getFunction(
-    nameOrSignature: "reapAndWithdrawFees"
-  ): TypedContractMethod<[tokenIds: BigNumberish[]], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "reapSafForTokenIds"
-  ): TypedContractMethod<[tokenIds: BigNumberish[]], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "sellShares"
-  ): TypedContractMethod<[amount: BigNumberish], [void], "payable">;
-  getFunction(
-    nameOrSignature: "withdrawAccumulatedFees"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+  getMinimumSubPool(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getEvent(
-    key: "FeeCollected"
-  ): TypedContractEvent<
-    FeeCollectedEvent.InputTuple,
-    FeeCollectedEvent.OutputTuple,
-    FeeCollectedEvent.OutputObject
-  >;
-  getEvent(
-    key: "Trade"
-  ): TypedContractEvent<
-    TradeEvent.InputTuple,
-    TradeEvent.OutputTuple,
-    TradeEvent.OutputObject
-  >;
+  getPrice(
+    _supply: BigNumberish,
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getSellPrice(
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getSubscriptionPoolRemaining(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  increaseSubscriptionPool(
+    tokenId: BigNumberish,
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  reapAndWithdrawFees(
+    tokenIds: BigNumberish[],
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  reapSafForTokenIds(
+    tokenIds: BigNumberish[],
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  sellShares(
+    amount: BigNumberish,
+    overrides?: PayableOverrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  withdrawAccumulatedFees(
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  callStatic: {
+    buyShares(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    decreaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    getBuyPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getCurrentPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getMinimumSubPool(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPrice(
+      _supply: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSellPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSubscriptionPoolRemaining(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    increaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    reapAndWithdrawFees(
+      tokenIds: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    reapSafForTokenIds(
+      tokenIds: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    sellShares(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    withdrawAccumulatedFees(overrides?: CallOverrides): Promise<void>;
+  };
 
   filters: {
-    "FeeCollected(uint256,uint256,uint256,uint256)": TypedContractEvent<
-      FeeCollectedEvent.InputTuple,
-      FeeCollectedEvent.OutputTuple,
-      FeeCollectedEvent.OutputObject
-    >;
-    FeeCollected: TypedContractEvent<
-      FeeCollectedEvent.InputTuple,
-      FeeCollectedEvent.OutputTuple,
-      FeeCollectedEvent.OutputObject
-    >;
+    "FeeCollected(uint256,uint256,uint256,uint256)"(
+      tokenId?: null,
+      feeCollected?: null,
+      subscriptionPoolRemaining?: null,
+      liquidationStartedAt?: null
+    ): FeeCollectedEventFilter;
+    FeeCollected(
+      tokenId?: null,
+      feeCollected?: null,
+      subscriptionPoolRemaining?: null,
+      liquidationStartedAt?: null
+    ): FeeCollectedEventFilter;
 
-    "Trade(address,address,bool,uint256,uint256,uint256)": TypedContractEvent<
-      TradeEvent.InputTuple,
-      TradeEvent.OutputTuple,
-      TradeEvent.OutputObject
-    >;
-    Trade: TypedContractEvent<
-      TradeEvent.InputTuple,
-      TradeEvent.OutputTuple,
-      TradeEvent.OutputObject
-    >;
+    "Trade(address,address,bool,uint256,uint256,uint256)"(
+      trader?: null,
+      subject?: null,
+      isBuy?: null,
+      shareAmount?: null,
+      ethAmount?: null,
+      supply?: null
+    ): TradeEventFilter;
+    Trade(
+      trader?: null,
+      subject?: null,
+      isBuy?: null,
+      shareAmount?: null,
+      ethAmount?: null,
+      supply?: null
+    ): TradeEventFilter;
+  };
+
+  estimateGas: {
+    buyShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    decreaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    getBuyPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getCurrentPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getMinimumSubPool(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPrice(
+      _supply: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSellPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSubscriptionPoolRemaining(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    increaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    reapAndWithdrawFees(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    reapSafForTokenIds(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    sellShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    withdrawAccumulatedFees(
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+  };
+
+  populateTransaction: {
+    buyShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    decreaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    getBuyPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getCurrentPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getMinimumSubPool(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getPrice(
+      _supply: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSellPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSubscriptionPoolRemaining(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    increaseSubscriptionPool(
+      tokenId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    reapAndWithdrawFees(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    reapSafForTokenIds(
+      tokenIds: BigNumberish[],
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    sellShares(
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawAccumulatedFees(
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
   };
 }

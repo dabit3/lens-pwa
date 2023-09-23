@@ -2,5 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ShareSample } from "./ShareSample";
+export type { ShareSampleFactory } from "./ShareSampleFactory";
 export * as factories from "./factories";
 export { ShareSample__factory } from "./factories/ShareSample__factory";
+export { ShareSampleFactory__factory } from "./factories/ShareSampleFactory__factory";
