@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Media {
+  id        Int      @id @default(autoincrement())
+  uri      String @db.VarChar(2048)
+  caption     String @db.VarChar(255)
+  creatorWalletAddress String @db.VarChar(255)
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  walletAddress String @db.VarChar(255) @unique()
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  creatorWalletAddress String @db.VarChar(255)
+  subscriberWalletAddress String @db.VarChar(255)
+  numKeys Int @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([creatorWalletAddress, subscriberWalletAddress])
+}
