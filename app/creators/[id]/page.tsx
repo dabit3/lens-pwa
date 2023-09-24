@@ -10,7 +10,7 @@ import { BigNumber } from "ethers";
 
 const CreatorDetail = ({ params }: { params: { id: string } }) => {
   const contract = params.id;
-  const { myInteger } = useMyContext();
+  const { myInteger, setTokenSupply } = useMyContext();
   const router = usePathname();
 
   const { wallets } = useWallets();
@@ -28,8 +28,8 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
     id: contract,
     name: `Creator ${contract}`,
     description: `Description for Creator ${contract}`,
-    keyPrice: 10.8,
-    subscriptionFee: 0.83,
+    keyPrice: blob?.price,
+    subscriptionFee: blob?.fee,
   };
 
   return (
@@ -73,6 +73,7 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
               const success = await buyTrigger(price);
               if (success) {
                 refetch();
+                setTokenSupply(blob?.supply);
               }
             }}
           >
@@ -84,6 +85,7 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
               const s = await sellTrigger();
               if (s) {
                 refetch();
+                setTokenSupply(blob?.supply ? blob?.supply : '0');
               }
             }}
           >

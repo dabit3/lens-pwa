@@ -82,7 +82,7 @@ function CreatorCard({
     "Crypto investor",
   ];
 
-  const { setMyInteger } = useMyContext();
+  const { setMyInteger, setSelectedContract, setSelectedUserWallet, setTokenSupply } = useMyContext();
 
   const { blob } = useHandleGetTokenPrice(contract, userWallet);
   console.log({blob})
@@ -90,7 +90,12 @@ function CreatorCard({
     <Link
       key={index}
       href={`/creators/${contract}`}
-      onClick={() => setMyInteger(index)}
+      onClick={() => {
+        setMyInteger(index);
+        setSelectedContract(contract);
+        setSelectedUserWallet(userWallet);
+        setTokenSupply(blob?.supply ? blob?.supply : '0');
+      }}
     >
       <div className="bg-white p-4 mb-4 rounded shadow flex items-center justify-between">
         {" "}
@@ -114,14 +119,13 @@ function CreatorCard({
           </div>
         </div>
         <div className="text-right">
-          {/* {creatorPrices.length === newCreators.length ? (
+          {blob ? (
             <p className="text-2xl font-semibold text-black">
-              {creatorPrices[index]} ETH
+              {blob?.price} ETH
             </p>
           ) : (
             <Spinner />
-          )}{" "}
-          Added the "20 ETH" text */}
+          )}
         </div>
       </div>
     </Link>

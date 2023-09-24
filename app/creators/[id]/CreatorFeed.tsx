@@ -3,8 +3,11 @@ import { useMyContext } from '@/context/appcontext';
 import React from 'react';
 
 const CreatorFeed = () => {
+  const creatorNames = ["Vitalik", "Toly", "Brian", "Ryan"];
+
+
   // Replace this with your actual post data
-  const { myInteger } = useMyContext();
+  const { myInteger, tokenSupply  } = useMyContext();
 
 
   const isSubscribed = true;
@@ -12,16 +15,30 @@ const CreatorFeed = () => {
   const posts = [
     {
       id: 1,
-      creatorImage: '/images/icons/iconmain-128x128.png',
-      content: 'This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.This is the content of the first post.',
+      content: 'This is the content of the first post',
     },
     {
       id: 2,
-      creatorImage: '/images/icons/iconmain-128x128.png',
       content: 'This is the content of the second post.',
     },
-    // Add more posts as needed
+    {
+      id: 3,
+      content: 'This is the content of the third post.',
+    },
+    {
+      id: 4,
+      content: 'This is the content of the fourth post.',
+    },
+    {
+      id: 5,
+      content: 'This is the content of the fifth post.',
+    },
+    {
+      id: 6,
+      content: 'This is the content of the sixth post.',
+    },
   ];
+  
 
   return (
     // <div className="p-4 bg-gray-600"> {/* Gray background for the feed */}
@@ -41,7 +58,7 @@ const CreatorFeed = () => {
     //   ))}
     // </div>
     <div className="rounded overflow-hidden border w-full bg-gray-800 mx-3 md:mx-0 lg:mx-0">
-        {isSubscribed ? posts.map(( post,i) => (
+        {(tokenSupply === '0') ? posts.map(( post,i) => (
             <>
                 <div className="w-full flex justify-between p-3">
                 <div className="flex">
@@ -56,11 +73,11 @@ const CreatorFeed = () => {
                 </div>
                 <span className="px-2 hover:bg-gray-300 cursor-pointer rounded"><i className="fas fa-ellipsis-h pt-2 text-lg"></i></span>
               </div>
-              <img className="w-full bg-cover" src="https://3.bp.blogspot.com/-Chu20FDi9Ek/WoOD-ehQ29I/AAAAAAAAK7U/mc4CAiTYOY8VzOFzBKdR52aLRiyjqu0MwCLcBGAs/s1600/DSC04596%2B%25282%2529.JPG" />
+              <img className="w-full bg-cover" src={`/images/postpic${i}.png`} />
               <div className="px-3 pb-2">
                 <div className="pt-1">
                   <div className="mb-2 text-sm">
-                    <span className="font-medium mr-2">braydoncoyer</span> Lord of the Rings is my favorite film-series. One day I make my way to New Zealand to visit the Hobbiton set!
+                    <span className="font-medium mr-2">{creatorNames[myInteger]}</span> Lord of the Rings is my favorite film-series. One day I make my way to New Zealand to visit the Hobbiton set!
                   </div>
                 </div>
               </div>
