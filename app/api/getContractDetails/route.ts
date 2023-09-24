@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 	const fee = ethers.utils.formatUnits(values[1].toNumber() * feePerc, 18);
 	const remainingDeposit = ethers.utils.formatEther(values[2]);
 	const supply = ethers.utils.formatEther(values[3]);
-	const balance = values[4];
+	const balance = values[4].toNumber();
 
 	return NextResponse.json(
 		{
@@ -46,6 +46,6 @@ export async function GET(request: NextRequest) {
 			fee: fee,
 			remainingDeposit: remainingDeposit,
 			supply: supply,
-			hasKey: balance ? true : false
+			balance: balance
 		});
 }
