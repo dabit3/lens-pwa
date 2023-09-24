@@ -113,13 +113,6 @@ function Nav() {
         <Link href="/search" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
           <p>Search</p>
         </Link>
-        {
-          user && (
-            <Link href="/profile" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
-              <p>Profile</p>
-            </Link>
-          )
-        }
       </div>
       <div className='
         flex

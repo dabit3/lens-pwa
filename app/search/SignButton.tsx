@@ -2,7 +2,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { ethers } from "ethers";
 import { useState } from 'react';
 import {ShareSample__factory} from '../../typechain/factories/ShareSample__factory';
-
+import { useMyContext } from "@/context/appcontext";
 // Import the contract ABI and contract address
 // import MyNFTContract from './MyNFTContract.json'; // Replace with your contract's JSON file
 
@@ -13,12 +13,10 @@ export function SignMessageButton() {
   const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
   embeddedWallet?.switchChain(1337);
 
-//   const sampleChain = "0x$eip155:1";
-// const sampleChain = "0x1";
-const sampleChain = 1337;
 
   const thing = async () => {
-    await embeddedWallet?.switchChain(sampleChain); // make sure the wallet is on the correct chain
+    const {chainId} = useMyContext();
+    await embeddedWallet?.switchChain(chainId); // make sure the wallet is on the correct chain
     const provider = await embeddedWallet?.getEthersProvider(); // ethers provider object
     console.log(provider);
     const signer = provider?.getSigner(); // ethers signer object

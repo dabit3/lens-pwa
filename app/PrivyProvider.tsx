@@ -2,7 +2,7 @@
 
 import { MyContextProvider } from '@/context/appcontext';
 import { PrivyProvider } from '@privy-io/react-auth'
-import {foundry, localhost} from '@wagmi/chains';
+import {foundry, localhost, baseGoerli} from '@wagmi/chains';
 
 
 export default function Provider({
@@ -10,7 +10,6 @@ export default function Provider({
 }) {
     return (
       <MyContextProvider>
-
       <PrivyProvider
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
         config={{
@@ -24,16 +23,10 @@ export default function Provider({
             createOnLogin: 'all-users',
             noPromptOnSignature: false
           },
-          // rpcConfig: {
-          //   rpcUrls: {
-          //     1337 : "http://127.0.0.1:8545",
-          // }
-          // },
-          additionalChains: [foundry, localhost]
+          additionalChains: [foundry, localhost, baseGoerli]
         }}>
            {children}
       </PrivyProvider>
       </MyContextProvider>
-
     )
 }
