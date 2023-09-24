@@ -68,6 +68,7 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
               if (rd.lt(fee)){
                 price = price.add(fee.sub(rd)).add(1)
               }
+              console.log({price})
 
               const success = await buyTrigger(price);
               if (success) {

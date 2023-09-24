@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   const contract = getKeyContractProvider(contractAddress);
   const values = await Promise.all([
     contract.getCurrentPrice(),
-    contract.getCurrentPrice(),
+    contract.getTaxPrice(1),
     contract.getSubscriptionPoolRemaining(walletAddress),
     contract.getSupply(),
     contract.balanceOf(walletAddress),

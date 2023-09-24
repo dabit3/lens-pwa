@@ -37,8 +37,10 @@ export interface ShareSampleInterface extends utils.Interface {
     "getMinimumSubPool()": FunctionFragment;
     "getPrice(uint256,uint256)": FunctionFragment;
     "getSellPrice(uint256)": FunctionFragment;
+    "getShareSubject()": FunctionFragment;
     "getSubscriptionPoolRemaining(address)": FunctionFragment;
     "getSupply()": FunctionFragment;
+    "getTaxPrice(uint256)": FunctionFragment;
     "increaseSubscriptionPool(uint256,uint256)": FunctionFragment;
     "sellShares(uint256)": FunctionFragment;
     "withdrawAccumulatedFees()": FunctionFragment;
@@ -54,8 +56,10 @@ export interface ShareSampleInterface extends utils.Interface {
       | "getMinimumSubPool"
       | "getPrice"
       | "getSellPrice"
+      | "getShareSubject"
       | "getSubscriptionPoolRemaining"
       | "getSupply"
+      | "getTaxPrice"
       | "increaseSubscriptionPool"
       | "sellShares"
       | "withdrawAccumulatedFees"
@@ -91,10 +95,18 @@ export interface ShareSampleInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getShareSubject",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getSubscriptionPoolRemaining",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "getSupply", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getTaxPrice",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "increaseSubscriptionPool",
     values: [BigNumberish, BigNumberish]
@@ -132,10 +144,18 @@ export interface ShareSampleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getShareSubject",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getSubscriptionPoolRemaining",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getSupply", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getTaxPrice",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "increaseSubscriptionPool",
     data: BytesLike
@@ -243,12 +263,19 @@ export interface ShareSample extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getShareSubject(overrides?: CallOverrides): Promise<[string]>;
+
     getSubscriptionPoolRemaining(
       addr: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     getSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getTaxPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     increaseSubscriptionPool(
       tokenId: BigNumberish,
@@ -299,12 +326,19 @@ export interface ShareSample extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getShareSubject(overrides?: CallOverrides): Promise<string>;
+
   getSubscriptionPoolRemaining(
     addr: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTaxPrice(
+    amount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   increaseSubscriptionPool(
     tokenId: BigNumberish,
@@ -352,12 +386,19 @@ export interface ShareSample extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getShareSubject(overrides?: CallOverrides): Promise<string>;
+
     getSubscriptionPoolRemaining(
       addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTaxPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     increaseSubscriptionPool(
       tokenId: BigNumberish,
@@ -436,12 +477,19 @@ export interface ShareSample extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getShareSubject(overrides?: CallOverrides): Promise<BigNumber>;
+
     getSubscriptionPoolRemaining(
       addr: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTaxPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     increaseSubscriptionPool(
       tokenId: BigNumberish,
@@ -496,12 +544,19 @@ export interface ShareSample extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getShareSubject(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getSubscriptionPoolRemaining(
       addr: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getTaxPrice(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     increaseSubscriptionPool(
       tokenId: BigNumberish,
