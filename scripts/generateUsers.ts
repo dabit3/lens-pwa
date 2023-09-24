@@ -11,22 +11,29 @@ async function run() {
   const factory = getKeyContractFactoryProvider();
   for (const address of addresses) {
     try {
-    const tx = await factory.createShareSample(address);
-    await prisma.user.upsert({
-      create: {
-        walletAddress: address,
-        contractAddress: tx.data,
-      },
-      update: {
-        contractAddress: tx.data,
-      },
-      where: {
-        walletAddress: address,
-      },
-    });
-    }
-    catch (error) {
+      const tx = await factory.createShareSample(address);
+      const res = await tx.wait();
+    } catch (error) {
       console.log(error);
+    }
+
+    const [addresses, contracts] = await factory.getDeployedContracts();
+    for (let i = 0; i < addresses.length; i++) {
+      const address = addresses[i];
+      const contract = contracts[i];
+
+      await prisma.user.upsert({
+        create: {
+          walletAddress: address,
+          contractAddress: contract,
+        },
+        update: {
+          contractAddress: contract,
+        },
+        where: {
+          walletAddress: address,
+        },
+      });
     }
   }
 }
