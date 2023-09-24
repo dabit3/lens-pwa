@@ -10,7 +10,7 @@ import { BigNumber } from "ethers";
 
 const CreatorDetail = ({ params }: { params: { id: string } }) => {
   const contract = params.id;
-  const { myInteger, setTokenSupply } = useMyContext();
+  const { myInteger } = useMyContext();
   const router = usePathname();
 
   const { wallets } = useWallets();
@@ -20,7 +20,10 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
   const { trigger: buyTrigger } = useHandleBuyToken(contract, 1);
   const { trigger: sellTrigger } = useHandleSellToken(contract, 1);
 
-  const { blob, refetch } = useGetTokenPrice(contract, embeddedWallet?.address!);
+  const { blob, refetch } = useGetTokenPrice(
+    contract,
+    embeddedWallet?.address!
+  );
 
   // Replace this with your creator data retrieval logic based on the ID
   // For this example, we'll use dummy data again.
@@ -58,26 +61,29 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"
             onClick={async () => {
-              if (!blob?.rawPrice || !blob.rawFee || !blob.rawRemainingDeposit ) {
+              if (
+                !blob?.rawPrice ||
+                !blob.rawFee ||
+                !blob.rawRemainingDeposit
+              ) {
                 return;
               }
 
-              let price = BigNumber.from(blob.rawPrice)
-              const rd = BigNumber.from(blob.rawRemainingDeposit)
-              const fee = BigNumber.from(blob.rawFee)
-              if (rd.lt(fee)){
-                price = price.add(fee.sub(rd)).add(1)
+              let price = BigNumber.from(blob.rawPrice);
+              const rd = BigNumber.from(blob.rawRemainingDeposit);
+              const fee = BigNumber.from(blob.rawFee);
+              if (rd.lt(fee)) {
+                price = price.add(fee.sub(rd)).add(1);
               }
-              console.log({price})
+              console.log({ price });
 
               const success = await buyTrigger(price);
               if (success) {
                 refetch();
-                setTokenSupply(blob?.supply);
               }
             }}
           >
-          <p className="font-semibold">Buy</p>
+            <p className="font-semibold">Buy</p>
           </button>
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"
@@ -85,7 +91,6 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
               const s = await sellTrigger();
               if (s) {
                 refetch();
-                setTokenSupply(blob?.supply ? blob?.supply : '0');
               }
             }}
           >
@@ -106,7 +111,7 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
         {/* Align content to the left */}
         <p className="text-white-200">(goes directly to the artist)</p>
       </div>
-      <CreatorFeed />
+      <CreatorFeed blob={blob}/>
     </main>
   );
 };

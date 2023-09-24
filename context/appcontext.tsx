@@ -1,3 +1,4 @@
+import { InfoBlob } from "@/app/types";
 import {
   createContext,
   useState,
@@ -16,6 +17,8 @@ type MyContextType = {
   setMyInteger: React.Dispatch<React.SetStateAction<number>>;
   tokenSupply: string;
   setTokenSupply: React.Dispatch<React.SetStateAction<string>>;
+  contextBlob: InfoBlob | undefined;
+  setContextBlob: React.Dispatch<React.SetStateAction<InfoBlob | undefined>>;
   // creatorName: string;
 };
 
@@ -39,7 +42,7 @@ export function MyContextProvider({ children }: MyContextProviderProps) {
   const [selectedContract, setSelectedContract] = useState<string>(''); // Initialize with your desired integer value
   const [selectedUserWallet, setSelectedUserWallet] = useState<string>(''); // Initialize with your desired integer value
   const [tokenSupply, setTokenSupply] = useState<string>(''); // Initialize with your desired integer value
-
+  const [contextBlob, setContextBlob] = useState<InfoBlob>(); // Initialize with your desired integer value
   useEffect(() => {
     fetch("/api/chain").then((response) => {
       if (response.ok) {
@@ -54,7 +57,7 @@ export function MyContextProvider({ children }: MyContextProviderProps) {
   });
 
   return (
-    <MyContext.Provider value={{ myInteger, setMyInteger, chainId, selectedContract, selectedUserWallet, setSelectedContract, setSelectedUserWallet, tokenSupply, setTokenSupply }}>
+    <MyContext.Provider value={{ myInteger, setMyInteger, chainId, selectedContract, selectedUserWallet, setSelectedContract, setSelectedUserWallet, tokenSupply, setTokenSupply, contextBlob, setContextBlob }}>
       {children}
     </MyContext.Provider>
   );

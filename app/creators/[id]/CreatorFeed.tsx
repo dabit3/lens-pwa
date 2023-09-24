@@ -1,16 +1,14 @@
 'use client'
+import { InfoBlob } from '@/app/types';
 import { useMyContext } from '@/context/appcontext';
 import React from 'react';
 
-const CreatorFeed = () => {
+const CreatorFeed = ({blob}:{blob:InfoBlob | undefined}) => {
   const creatorNames = ["Vitalik", "Toly", "Brian", "Ryan"];
 
 
   // Replace this with your actual post data
-  const { myInteger, tokenSupply  } = useMyContext();
-
-
-  const isSubscribed = true;
+  const { myInteger } = useMyContext();
 
   const posts = [
     {
@@ -58,7 +56,7 @@ const CreatorFeed = () => {
     //   ))}
     // </div>
     <div className="rounded overflow-hidden border w-full bg-gray-800 mx-3 md:mx-0 lg:mx-0">
-        {(tokenSupply === '0') ? posts.map(( post,i) => (
+        {(blob?.balance !== 0) ? posts.map(( post,i) => (
             <>
                 <div className="w-full flex justify-between p-3">
                 <div className="flex">
