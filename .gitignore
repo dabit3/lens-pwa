@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+
+typechain/
+.env
+
 # testing
 /coverage
 
