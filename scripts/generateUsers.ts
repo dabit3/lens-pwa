@@ -11,10 +11,16 @@ async function run() {
   const factory = getKeyContractFactoryProvider();
   for (const address of addresses) {
     const tx = await factory.createShareSample(address);
-    await prisma.user.create({
-      data: {
+    await prisma.user.upsert({
+      create: {
         walletAddress: address,
         contractAddress: tx.data,
+      },
+      update: {
+        contractAddress: tx.data,
+      },
+      where: {
+        walletAddress: address,
       },
     });
   }
