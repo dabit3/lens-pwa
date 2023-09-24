@@ -30,38 +30,6 @@ export function SignMessageButton() {
 
   }
 
-  const shareFac = async () => {
-    await embeddedWallet?.switchChain(sampleChain); // make sure the wallet is on the correct chain
-    const provider = await embeddedWallet?.getEthersProvider(); // ethers provider object
-    console.log(provider);
-    const signer = provider?.getSigner(); // ethers signer object
-    console.log(signer);
-    if (signer) {
-        try {
-          const address = await signer.getAddress(); // Get the wallet address
-          const shareSampleFactory = new ShareSample__factory(signer);
-          const deploymentTransaction = await shareSampleFactory.getDeployTransaction(
-            // Provide the constructor parameters here
-            // For example:
-            // '0xYourWithdrawAddress',
-            address,
-            100, // Subscription rate
-            // '0xSharesSubjectAddress'
-            address
-          );
-  
-          // Send the deployment transaction
-          const txResponse = await signer.sendTransaction(deploymentTransaction);
-  
-          // Wait for the deployment to be mined
-          await txResponse.wait();
-  
-          console.log('ShareSample contract deployed successfully');
-        } catch (error) {
-          console.error('Error deploying ShareSample contract:', error);
-        }
-      }
-  }
 
 //   const mintNFT = async () => {
 //     await embeddedWallet?.switchChain(sampleChain); // make sure the wallet is on the correct chain
@@ -99,9 +67,6 @@ export function SignMessageButton() {
   return (
     <>
     <p>Wallet: {embeddedWallet?.address}</p>
-    <button onClick={shareFac}>
-        Contract creation
-    </button>
     <br />
     <button onClick={thing}>
         Bal : {walletBallance}
