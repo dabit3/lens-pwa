@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -22,6 +22,7 @@
     "@vercel/blob": "^0.12.5",
     "@vercel/kv": "^0.2.3",
     "@vercel/postgres": "^0.5.0",
+    "@wagmi/chains": "^1.8.0",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
     "autoprefixer": "10.4.15",
@@ -30,6 +31,7 @@
     "dotenv": "^16.3.1",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.17",
+    "ethers": "^5.7.2",
     "lucide-react": "^0.268.0",
     "next": "13.4.17",
     "next-themes": "^0.2.1",

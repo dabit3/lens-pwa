@@ -5,9 +5,14 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
 
-  const blob = await put(filename, request.body, {
-    access: 'public',
-  });
+  let blob;
+  if (request?.body) {
+    blob = await put(filename ? filename : '', request.body, {
+      access: 'public',
+    });
+  }
+
+  console.log(blob);
 
   return NextResponse.json(blob);
 }

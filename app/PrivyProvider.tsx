@@ -1,6 +1,8 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
+import {foundry, localhost} from '@wagmi/chains';
+
 
 export default function Provider({
   children
@@ -13,12 +15,18 @@ export default function Provider({
           appearance: {
             theme: 'dark',
             accentColor: '#676FFF',
-            logo: 'https://i.imgur.com/tzKMWv9.png',
+            logo: '/images/OnlySubs.jpg',
           },
           embeddedWallets: {
             createOnLogin: 'all-users',
-            noPromptOnSignature: true
-          }
+            noPromptOnSignature: false
+          },
+          // rpcConfig: {
+          //   rpcUrls: {
+          //     1337 : "http://127.0.0.1:8545",
+          // }
+          // },
+          additionalChains: [foundry, localhost]
         }}>
            {children}
       </PrivyProvider>

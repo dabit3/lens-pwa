@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useState, useEffect } from 'react'
-import { useWalletLogin } from '@lens-protocol/react-web';
+// import { useWalletLogin } from '@lens-protocol/react-web';
 import { useLogin } from '@privy-io/react-auth';
 import { useWallets } from '@privy-io/react-auth'
-import LensProvider from './LensProvider'
+// import LensProvider from './LensProvider'
 import PrivyProvider from './PrivyProvider'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -34,12 +34,10 @@ export default function RootLayout({ children }) {
 
       <body className={inter.className}>
         <PrivyProvider>
-          <LensProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Nav />
               {children}
             </ThemeProvider>
-          </LensProvider>
         </PrivyProvider>
       </body>
     </html>
@@ -51,7 +49,7 @@ function Nav() {
   const { logout, user } = usePrivy()
   const [isInstalled, setIsInstalled] = useState(true)
   const [deferredPrompt, setDeferredPrompt] = useState<any>()
-  const { execute: loginWithLens } = useWalletLogin()
+  // const { execute: loginWithLens } = useWalletLogin()
   const { wallets } = useWallets()
 
   const { login } = useLogin({
@@ -60,11 +58,11 @@ function Nav() {
       // if (!wallets[0]) return
       if (!user.wallet) return
       console.log('user: ', user)
-      const loggedIn = await loginWithLens({
-        // address: wallets[0].address,
-        address: user.wallet?.address
-      })
-      console.log('loggedIn: ', loggedIn)
+      // const loggedIn = await loginWithLens({
+      //   // address: wallets[0].address,
+      //   address: user.wallet?.address
+      // })
+      // console.log('loggedIn: ', loggedIn)
       window.scrollTo({ top: 0, behavior: "smooth" })
     }
   })
@@ -104,10 +102,13 @@ function Nav() {
       >
         <Link href="/" className='mr-5 flex items-center'>
           <IconComponent className="opacity-85" size={19} />
-          <p className={`ml-2 mr-4 text-lg font-semibold`}>lenspwa</p>
+          <p className={`ml-2 mr-4 text-lg font-semibold`}>OnlySubs</p>
         </Link>
         <Link href="/" className={`mr-5 text-sm ${pathname !== '/' && 'opacity-50'}`}>
           <p>Home</p>
+        </Link>
+        <Link href="/creatorlist" className={`mr-5 text-sm ${pathname !== '/' && 'opacity-50'}`}>
+          <p>Creators</p>
         </Link>
         <Link href="/search" className={`mr-5 text-sm ${pathname !== '/search' && 'opacity-60'}`}>
           <p>Search</p>
