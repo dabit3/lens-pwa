@@ -9,7 +9,7 @@ const addresses = [
 
 async function run() {
   const factory = getKeyContractFactoryProvider();
-  addresses.forEach(async (address) => {
+  for (const address of addresses) {
     const tx = await factory.createShareSample(address);
     await prisma.user.create({
       data: {
@@ -17,7 +17,7 @@ async function run() {
         contractAddress: tx.data,
       },
     });
-  });
+  }
 }
 
 run().then(() => console.log("done"));
