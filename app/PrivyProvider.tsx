@@ -1,5 +1,6 @@
 'use client'
 
+import { MyContextProvider } from '@/context/appcontext';
 import { PrivyProvider } from '@privy-io/react-auth'
 import {foundry, localhost} from '@wagmi/chains';
 
@@ -8,6 +9,8 @@ export default function Provider({
   children
 }) {
     return (
+      <MyContextProvider>
+
       <PrivyProvider
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
         config={{
@@ -30,5 +33,7 @@ export default function Provider({
         }}>
            {children}
       </PrivyProvider>
+      </MyContextProvider>
+
     )
 }
