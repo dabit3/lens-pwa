@@ -47,6 +47,7 @@ const CreatorsList = () => {
         {newCreators && newCreators.length > 0 && embeddedWallet?.address ? (
           newCreators.map((creator, index) => (
             <CreatorCard
+              key={index}
               index={index}
               contract={creator.contractAddress}
               userWallet={embeddedWallet.address}
