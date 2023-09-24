@@ -102,8 +102,9 @@ const sampleChain = 1337;
   // Users must have an embedded wallet at `user.wallet` to sign a message.
   return (
     <>
+    <p>Wallet: {embeddedWallet?.address}</p>
     <button onClick={shareFac}>
-        ShareThing
+        Contract creation
     </button>
     <br />
     <button onClick={thing}>
