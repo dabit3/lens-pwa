@@ -1,11 +1,15 @@
 'use client'
 
+import { MyContextProvider } from '@/context/appcontext';
 import { PrivyProvider } from '@privy-io/react-auth'
+import {foundry, localhost, baseGoerli} from '@wagmi/chains';
+
 
 export default function Provider({
   children
 }) {
     return (
+      <MyContextProvider>
       <PrivyProvider
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
         config={{
@@ -13,14 +17,16 @@ export default function Provider({
           appearance: {
             theme: 'dark',
             accentColor: '#676FFF',
-            logo: 'https://i.imgur.com/tzKMWv9.png',
+            logo: '/images/OnlySubs.jpg',
           },
           embeddedWallets: {
             createOnLogin: 'all-users',
-            noPromptOnSignature: true
-          }
+            noPromptOnSignature: false
+          },
+          additionalChains: [foundry, localhost, baseGoerli]
         }}>
            {children}
       </PrivyProvider>
+      </MyContextProvider>
     )
 }
