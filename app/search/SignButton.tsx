@@ -1,7 +1,7 @@
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { ethers } from "ethers";
 import { useState } from 'react';
-import {ShareSample__factory} from '../typechain/factories/ShareSample__factory';
+import {ShareSample__factory} from '../../typechain/factories/ShareSample__factory';
 
 // Import the contract ABI and contract address
 // import MyNFTContract from './MyNFTContract.json'; // Replace with your contract's JSON file
