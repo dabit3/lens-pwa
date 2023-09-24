@@ -58,13 +58,13 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"
             onClick={async () => {
-              if (!blob?.price || !blob.fee || !blob.remainingDeposit ) {
+              if (!blob?.rawPrice || !blob.rawFee || !blob.rawRemainingDeposit ) {
                 return;
               }
 
-              let price = BigNumber.from(blob.price)
-              const rd = BigNumber.from(blob.remainingDeposit)
-              const fee = BigNumber.from(blob.fee)
+              let price = BigNumber.from(blob.rawPrice)
+              const rd = BigNumber.from(blob.rawRemainingDeposit)
+              const fee = BigNumber.from(blob.rawFee)
               if (rd.lt(fee)){
                 price = price.add(fee.sub(rd)).add(1)
               }
@@ -75,7 +75,7 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
               }
             }}
           >
-            <p className="font-semibold">Buy</p>
+          <p className="font-semibold">Buy</p>
           </button>
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"

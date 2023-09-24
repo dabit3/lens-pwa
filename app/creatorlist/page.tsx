@@ -49,7 +49,9 @@ const CreatorsList = () => {
             <CreatorCard
               key={index}
               index={index}
+              creatorWallet={creator.walletAddress}
               contract={creator.contractAddress}
+
               userWallet={embeddedWallet.address}
             />
           ))
@@ -64,10 +66,12 @@ const CreatorsList = () => {
 function CreatorCard({
   index,
   contract,
+  creatorWallet,
   userWallet,
 }: {
   index: number;
   contract: string;
+  creatorWallet:string,
   userWallet: string;
 }) {
   const creatorNames = ["Vitalik", "Toly", "Brian", "Ryan"];
@@ -80,7 +84,7 @@ function CreatorCard({
 
   const { setMyInteger } = useMyContext();
 
-  const {  blob } = useHandleGetTokenPrice(contract, userWallet);
+  const { blob } = useHandleGetTokenPrice(contract, userWallet);
   console.log({blob})
   return (
     <Link
@@ -104,7 +108,7 @@ function CreatorCard({
           </div>
           <div>
             <h2 className="text-xl font-semibold text-black">
-              {creatorNames[index]}
+              {creatorNames[index]} - {creatorWallet}
             </h2>
             <p className="text-gray-600">{creatorDescriptions[index]}</p>
           </div>

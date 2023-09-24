@@ -1,5 +1,5 @@
 import { ShareSample__factory } from "../../../typechain/factories/ShareSample__factory";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
 import * as dotenv from "dotenv";
 import { getKeyContractProvider } from "@/utils/ethers";
@@ -43,5 +43,9 @@ export async function GET(request: NextRequest) {
     remainingDeposit: remainingDeposit,
     supply: supply,
     balance: balance,
+
+    rawFee: values[1].mul(ethers.BigNumber.from(15)).div(100).toString(),
+    rawPrice: values[0].toString(),
+    rawRemainingDeposit: values[2].toString(),
   });
 }
