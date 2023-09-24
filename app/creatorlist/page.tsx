@@ -4,6 +4,7 @@ import { useMyContext } from '@/context/appcontext';
 import {useWallets} from '@privy-io/react-auth';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import useHandleGetTokenPrice from '../hooks/handleGetTokenPrice';
 interface ContractData {
     contractAddress: string;
     createdAt: string;
@@ -41,6 +42,15 @@ const CreatorsList = () => {
 
   const [newCreators, setCreators] = useState<ContractData[]>([]);
 
+  const [creatorPrices, setCreatorPrices] = useState<any[]>([]);
+
+  const { refetch, status } = useHandleGetTokenPrice(newCreators);
+
+
+
+
+
+
 
 useEffect(() => {
     async function fetchData() {
@@ -61,6 +71,11 @@ useEffect(() => {
     
     fetchData();
 }, []);
+  
+useEffect(() => {
+    refetch();
+  }, [newCreators, refetch]);
+  
   
   console.log(newCreators);
 
@@ -86,7 +101,7 @@ useEffect(() => {
                 </div>
             </div>
             <div className="text-right">
-                <p className="text-2xl font-semibold text-black">20 ETH</p> {/* Added the "20 ETH" text */}
+                {(creatorPrices.length === newCreators.length) ? <p className="text-2xl font-semibold text-black">{creatorPrices[index]} ETH</p> : <Spinner />} {/* Added the "20 ETH" text */}
             </div>
             </div>
           </Link>

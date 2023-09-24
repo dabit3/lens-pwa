@@ -24,6 +24,8 @@ export async function GET(request: NextRequest) {
 		return NextResponse.json({ message: 'walletAddress not provided.' }, { status: 400 });
 	}
 
+	console.log(contractAddress);
+	console.log(walletAddress);
 	const contract = getContractProvider(contractAddress);
 	const values = await Promise.all(
 		[
