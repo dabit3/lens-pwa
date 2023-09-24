@@ -14,7 +14,11 @@ export default function ContentUploadPage() {
         onSubmit={async (event) => {
           event.preventDefault();
 
-          const file = inputFileRef.current.files[0];
+          const file = inputFileRef.current?.files?.[0];
+
+          if (!file) {
+            return;
+          }
 
           const response = await fetch(
             `/api/feed/upload?filename=${file.name}`,
