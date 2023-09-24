@@ -1,13 +1,12 @@
+import prisma from "@/utils/prisma";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { User } from "@/app/api/models/users";
 
-let users: User[] = []; // mock data store.
-
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
+  const users = await prisma.user.findMany();
   return NextResponse.json(
     {
-      body: request.body,
+      body: users,
       path: request.nextUrl.pathname,
       query: request.nextUrl.search,
       cookies: request.cookies.getAll(),
