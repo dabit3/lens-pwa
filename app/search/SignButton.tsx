@@ -11,16 +11,14 @@ export function SignMessageButton() {
   const { user, signMessage } = usePrivy();
   const {wallets} = useWallets();
   const embeddedWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
-  embeddedWallet?.switchChain(1337);
+  const {chainId} = useMyContext();
+  embeddedWallet?.switchChain(chainId);
 
 
   const thing = async () => {
-    const {chainId} = useMyContext();
     await embeddedWallet?.switchChain(chainId); // make sure the wallet is on the correct chain
     const provider = await embeddedWallet?.getEthersProvider(); // ethers provider object
-    console.log(provider);
     const signer = provider?.getSigner(); // ethers signer object
-    console.log(signer);
 
     if (signer) {
       const address = await signer.getAddress(); // Get the wallet address
