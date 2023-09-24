@@ -256,7 +256,7 @@ export interface ShareSampleFactory extends BaseContract {
     createShareSample(
       _sharesSubject: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<string>;
 
     deployedSubjects(
       arg0: BigNumberish,
