@@ -5,35 +5,32 @@ import CreatorFeed from "./CreatorFeed";
 import { useMyContext } from "@/context/appcontext";
 import useHandleBuyToken from "@/app/hooks/handleBuyToken";
 import useHandleSellToken from "@/app/hooks/handleSellToken";
+import useGetTokenPrice from "@/app/hooks/useGetTokenPrice";
+import { BigNumber } from "ethers";
 
 const CreatorDetail = ({ params }: { params: { id: string } }) => {
+  const contract = params.id;
   const { myInteger } = useMyContext();
   const router = usePathname();
 
-  console.log("heasdfre", params.id);
   const { wallets } = useWallets();
   const embeddedWallet = wallets.find(
     (wallet) => wallet.walletClientType === "privy"
   );
-  const { trigger: buyTrigger, status: buyStatus } = useHandleBuyToken(
-    params.id,
-    1
-  );
-  const { trigger: sellTrigger, status: sellStatus } = useHandleSellToken(
-    params.id,
-    1
-  );
+  const { trigger: buyTrigger } = useHandleBuyToken(contract, 1);
+  const { trigger: sellTrigger } = useHandleSellToken(contract, 1);
+
+  const { blob, refetch } = useGetTokenPrice(contract, embeddedWallet?.address!);
 
   // Replace this with your creator data retrieval logic based on the ID
   // For this example, we'll use dummy data again.
   const creator = {
-    id: params.id,
-    name: `Creator ${params.id}`,
-    description: `Description for Creator ${params.id}`,
+    id: contract,
+    name: `Creator ${contract}`,
+    description: `Description for Creator ${contract}`,
     keyPrice: 10.8,
     subscriptionFee: 0.83,
   };
-  console.log(myInteger);
 
   return (
     <main className="px-10 py-14">
@@ -60,13 +57,34 @@ const CreatorDetail = ({ params }: { params: { id: string } }) => {
           </div>
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"
-            onClick={buyTrigger}
+            onClick={async () => {
+              if (!blob?.price || !blob.fee || !blob.remainingDeposit ) {
+                return;
+              }
+
+              let price = BigNumber.from(blob.price)
+              const rd = BigNumber.from(blob.remainingDeposit)
+              const fee = BigNumber.from(blob.fee)
+              if (rd.lt(fee)){
+                price = price.add(fee.sub(rd)).add(1)
+              }
+
+              const success = await buyTrigger(price);
+              if (success) {
+                refetch();
+              }
+            }}
           >
             <p className="font-semibold">Buy</p>
           </button>
           <button
             className="ml-2 bg-orange-500 text-white p-2 rounded"
-            onClick={sellTrigger}
+            onClick={async () => {
+              const s = await sellTrigger();
+              if (s) {
+                refetch();
+              }
+            }}
           >
             <p className="font-semibold">Sell</p>
           </button>

@@ -47,6 +47,7 @@ const CreatorsList = () => {
         {newCreators && newCreators.length > 0 && embeddedWallet?.address ? (
           newCreators.map((creator, index) => (
             <CreatorCard
+              key={index}
               index={index}
               contract={creator.contractAddress}
               userWallet={embeddedWallet.address}
@@ -79,7 +80,7 @@ function CreatorCard({
 
   const { setMyInteger } = useMyContext();
 
-  const { refetch, blob } = useHandleGetTokenPrice(contract, userWallet);
+  const {  blob } = useHandleGetTokenPrice(contract, userWallet);
   console.log({blob})
   return (
     <Link

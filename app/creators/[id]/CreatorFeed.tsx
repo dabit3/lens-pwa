@@ -41,7 +41,7 @@ const CreatorFeed = () => {
     //   ))}
     // </div>
     <div className="rounded overflow-hidden border w-full bg-gray-800 mx-3 md:mx-0 lg:mx-0">
-        {isSubscribed ? posts.map((post) => (
+        {isSubscribed ? posts.map(( post,i) => (
             <>
                 <div className="w-full flex justify-between p-3">
                 <div className="flex">

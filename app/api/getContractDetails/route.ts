@@ -6,11 +6,6 @@ import { getKeyContractProvider } from "@/utils/ethers";
 import { InfoBlob } from "@/app/types";
 dotenv.config();
 
-const RPC = process.env.RPC_URL;
-if (!RPC) {
-  throw new Error("RPC not set");
-}
-
 export async function GET(request: NextRequest) {
   const contractAddress = request.nextUrl.searchParams.get("contractAddress");
   if (!contractAddress) {
@@ -26,8 +21,6 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  console.log({ walletAddress, contractAddress });
 
   const contract = getKeyContractProvider(contractAddress);
   const values = await Promise.all([
