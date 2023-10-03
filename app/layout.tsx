@@ -16,7 +16,7 @@ import {
 import { Web3ModalProvider } from "@/components/web3modal-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LensProvider } from "@/components/lens-provider"
-import { useWeb3Modal } from '@web3modal/react'
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 import { useAccount, useConnect, useDisconnect, useFeeData } from 'wagmi'
 import { InjectedConnector } from "wagmi/connectors/injected"
 
