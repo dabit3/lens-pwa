@@ -9,7 +9,7 @@ A boilerplate combining [Lens Protocol](https://www.lens.xyz/), [WalletConnect](
 1. Clone repo
 
 ```sh
-git clone git@github.com:dabit3/lens-shadcn.git
+git clone git@github.com:dabit3/lens-pwa.git
 ```
 
 2. Install dependencies
