@@ -1,11 +1,28 @@
 'use client'
-import {
-  useActiveProfile
-} from '@lens-protocol/react-web'
 
-export default function Search() {
-  const { data: profile } = useActiveProfile()
-  
+import { useAccount } from 'wagmi'
+import { useProfiles } from '@lens-protocol/react-web'
+
+export default function ProfileWrapper() {
+  const { address } = useAccount()
+  if (!address) return null
+
+  return (
+    <Profile
+      address={address}
+    />
+  )
+}
+
+function Profile({ address }) {
+  const { data } = useProfiles({
+    where: {
+      ownedBy: [address],
+    },
+  })
+
+  if (!data || !data.length) return null
+  const profile = data[data.length - 1]
   if (!profile) return null
 
   return (
@@ -14,29 +31,24 @@ export default function Search() {
         <a
           rel='no-opener'
           target='_blank'
-        href={`https://share.lens.xyz/u/${profile.handle}`}>
+        href={`https://share.lens.xyz/u/${profile.handle?.localName}.${profile.handle?.namespace}`}>
           <div className='border rounded-lg p-10'>
             <div>
               {
-                profile.picture?.__typename === 'MediaSet' && (
+                profile.metadata?.picture?.__typename === 'ImageSet' && (
                   <img
-                    src={profile?.picture?.original?.url}
-                    className='rounded w-[200px]'
-                  />
-                )
-              }
-              {
-                profile.picture?.__typename === 'NftImage' && (
-                  <img
-                    src={profile?.picture?.uri}
+                    src={profile?.metadata?.picture?.optimized?.uri}
                     className='rounded w-[200px]'
                   />
                 )
               }
             </div>
             <div className='mt-4'>
-              <p className='text-primary font-medium'>
-                {profile?.handle}
+              <p className='text-lg'>
+                {profile?.metadata?.displayName}
+              </p>
+              <p className='text-muted-foreground font-medium'>
+                {profile?.handle?.localName}.{profile?.handle?.namespace}
               </p>
             </div>
           </div>
