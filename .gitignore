@@ -18,6 +18,9 @@
 # misc
 .DS_Store
 *.pem
+yarn.lock
+bun.lockb
+package-lock.json
 
 # debug
 npm-debug.log*

@@ -11,14 +11,14 @@
   "dependencies": {
     "@lens-protocol/metadata": "^1.0.5",
     "@lens-protocol/react-web": "^2.0.0-alpha.19",
-    "@lens-protocol/wagmi": "^3.0.0-alpha.16",
+    "@lens-protocol/wagmi": "^3.0.0-alpha.22",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/node": "20.5.0",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
-    "@web3modal/wagmi": "^3.2.1",
+    "@web3modal/wagmi": "^3.5.0",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -38,6 +38,6 @@
     "tailwindcss-animate": "^1.0.6",
     "typescript": "5.1.6",
     "viem": "^1.19.1",
-    "wagmi": "^1.4.6"
+    "wagmi": "^1.4.12"
   }
 }
