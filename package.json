@@ -22,6 +22,7 @@
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "connectkit": "^1.6.0",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.17",
     "ethers": "^5.7.2",

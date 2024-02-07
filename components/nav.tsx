@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { disconnect } from '@wagmi/core'
 import { usePathname } from 'next/navigation'
@@ -10,7 +10,7 @@ import { ModeToggle } from '@/components/dropdown'
 import { ChevronRight, Droplets, LogOut } from "lucide-react"
 
 export function Nav() {
-  const { open } = useWeb3Modal()
+  const { setOpen } = useModal()
   const { address } = useAccount()
   const pathname = usePathname()
 
@@ -49,7 +49,7 @@ export function Nav() {
       '>
         {
           !address && (
-            <Button onClick={() => open()} variant="secondary" className="mr-4">
+            <Button onClick={() => setOpen(true)} variant="secondary" className="mr-4">
           Connect Wallet
           <ChevronRight className="h-4 w-4" />
         </Button>

@@ -2,7 +2,7 @@
 
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { Web3ModalProvider } from "@/components/web3modal-provider"
+import { ConnectKitProvider } from "@/components/connectkit-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LensProvider } from "@/components/lens-provider"
 import { Nav } from "@/components/nav"
@@ -23,14 +23,14 @@ export default function RootLayout({ children }) {
       <meta name="theme-color" content="#000000" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black" />
       <body className={inter.className}>
-        <Web3ModalProvider>
+        <ConnectKitProvider>
           <LensProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Nav />
               {children}
             </ThemeProvider>
           </LensProvider>
-        </Web3ModalProvider>
+        </ConnectKitProvider>
       </body>
     </html>
   )
